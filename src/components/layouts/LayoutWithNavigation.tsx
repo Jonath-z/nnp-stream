@@ -2,16 +2,37 @@ import HomeIcon from "@/components/icons/HomeIcon";
 import SearchIcon from "@/components/icons/SearchIcon";
 import BellIcon from "@/components/icons/BellIcon";
 import HeartIcon from "@/components/icons/HeartIcon";
-import { ReactNode, useState } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import Link from "next/link";
 import NnpLogo from "@/components/icons/NnpLogo";
 import ArrowIcon from "@/components/icons/Arrow";
 import NnpMinifiedLogo from "@/components/icons/NnpMinifiedLogo";
+import { useTranslation } from "next-i18next";
 
 export default function LayoutWithNavigation({ children }: { children: ReactNode }) {
   const { asPath } = useRouter();
-  const [sidebarOpened, setSidebarOpened] = useState(false);
+  const [sidebarOpened, setSidebarOpened] = useState(() => {
+    const sidebarStatus = localStorage.getItem("nnp-sd-status");
+    if (!sidebarStatus || sidebarStatus === "false") {
+      return false;
+    }
+    return true;
+  });
+  const { t } = useTranslation();
+
+  const saveSidebarStateInLocalStorage = (state: boolean) => {
+    if (typeof window !== "undefined") {
+      localStorage.setItem("nnp-sd-status", String(state));
+    }
+  };
+
+  const toggleSidebar = () => {
+    setSidebarOpened((prev) => {
+      saveSidebarStateInLocalStorage(!prev);
+      return !prev;
+    });
+  };
 
   return (
     <div>
@@ -21,7 +42,7 @@ export default function LayoutWithNavigation({ children }: { children: ReactNode
       >
         {sidebarOpened ? <NnpLogo /> : <NnpMinifiedLogo />}
         <button
-          onClick={() => setSidebarOpened((prev) => !prev)}
+          onClick={toggleSidebar}
           className="absolute bg-nnp-primary/70 right-0 top-1/2 -mr-7 w-7 h-16 flex items-center justify-center rounded-r-md "
         >
           <ArrowIcon className={`text-nnp-muted size-5  ${sidebarOpened ? "rotate-0" : "rotate-180"}`} />
@@ -31,13 +52,13 @@ export default function LayoutWithNavigation({ children }: { children: ReactNode
             <Link href="/" data-active={asPath.toLowerCase() === "/"} className="group flex items-center gap-2">
               <HomeIcon className="stroke-nnp-muted group-data-[active=true]:stroke-nnp-highlight transition-all" />
               <span className="text-nnp-muted group-data-[sidebaropened=false]/sidebar:hidden group-data-[active=true]:text-nnp-highlight group-data-[active=true]:font-bold transition-all">
-                Home
+                {t("nav.home")}
               </span>
             </Link>
             <Link href="/#" data-active={asPath.toLowerCase() === "search"} className="group flex items-center gap-2">
               <SearchIcon className="stroke-nnp-muted group-data-[active=true]:stroke-nnp-highlight transition-all" />
               <span className="text-nnp-muted group-data-[sidebaropened=false]/sidebar:hidden group-data-[active=true]:stroke-nnp-highlight transition-all">
-                Search
+                {t("nav.search")}
               </span>
             </Link>
             <Link
@@ -47,7 +68,7 @@ export default function LayoutWithNavigation({ children }: { children: ReactNode
             >
               <BellIcon className="stroke-nnp-muted group-data-[active=true]:stroke-nnp-highlight transition-all" />
               <span className="text-nnp-muted group-data-[sidebaropened=false]/sidebar:hidden group-data-[active=true]:stroke-nnp-highlight transition-all">
-                Notifications
+                {t("nav.notification")}
               </span>
             </Link>
             <Link
@@ -57,7 +78,7 @@ export default function LayoutWithNavigation({ children }: { children: ReactNode
             >
               <HeartIcon className="stroke-nnp-muted group-data-[active=true]:stroke-nnp-highlight transition-all" />
               <span className="text-nnp-muted group-data-[sidebaropened=false]/sidebar:hidden group-data-[active=true]:stroke-nnp-highlight transition-all">
-                Favorites
+                {t("nav.favorite")}
               </span>
             </Link>
           </div>

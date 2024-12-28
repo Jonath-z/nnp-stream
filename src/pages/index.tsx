@@ -1,6 +1,10 @@
 import { ReactElement } from "react";
 import { useTranslation } from "next-i18next";
-import LayoutWithNavigation from "@/components/layouts/LayoutWithNavigation";
+import dynamic from "next/dynamic";
+
+const LayoutWithNavigation = dynamic(() => import("@/components/layouts/LayoutWithNavigation"), {
+  ssr: false,
+});
 
 export default function Home() {
   const { t } = useTranslation();

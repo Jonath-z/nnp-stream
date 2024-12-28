@@ -1,3 +1,6 @@
 {
-  "nav.search": "Search"
+  "nav.search": "Search",
+  "nav.notifications": "Notifications",
+  "nav.home": "Home",
+  "nav.favorite": "Favorites"
 }
