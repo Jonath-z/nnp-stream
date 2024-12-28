@@ -8,8 +8,11 @@ export default {
   ],
   theme: {
     extend: {
-      fonts: {
+      fontFamily: {
         sans: ["Figtree", "sans-serif"],
+      },
+      spacing: {
+        "44.5": "180px",
       },
       transitionProperty: {
         width: "width",

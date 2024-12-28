@@ -8,11 +8,9 @@ import Link from "next/link";
 import NnpLogo from "@/components/icons/NnpLogo";
 import ArrowIcon from "@/components/icons/Arrow";
 import NnpMinifiedLogo from "@/components/icons/NnpMinifiedLogo";
-import { useTranslation } from "next-i18next";
 
 export default function LayoutWithNavigation({ children }: { children: ReactNode }) {
   const { asPath } = useRouter();
-  const { t } = useTranslation();
   const [sidebarOpened, setSidebarOpened] = useState(() => {
     const sidebarStatus = localStorage.getItem("nnp-sd-status");
     if (!sidebarStatus || sidebarStatus === "false") {
@@ -85,7 +83,7 @@ export default function LayoutWithNavigation({ children }: { children: ReactNode
         </nav>
         <div className="w-full px-10"></div>
       </div>
-      <div className="overflow-y-auto">{children}</div>
+      <div className="overflow-y-auto w-fit mx-auto py-20 flex-1">{children}</div>
       <div className="fixed bg-gradient-to-br from-nnp-gradient blur-[100px] to-transparent rounded-br-full rounded-tr-full w-1/2 h-1/2 top-0 left-0 -z-10" />
       <div className="fixed bg-gradient-to-br from-nnp-gradient blur-[100px] to-transparent rounded-br-full rounded-tr-full w-1/2 h-28 bottom-0 left-0 -mb-20 -z-10" />
     </div>
