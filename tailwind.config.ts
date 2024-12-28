@@ -8,9 +8,19 @@ export default {
   ],
   theme: {
     extend: {
+      fonts: {
+        sans: ["Figtree", "sans-serif"],
+      },
+      transitionProperty: {
+        width: "width",
+      },
       colors: {
         background: "var(--background)",
         foreground: "var(--foreground)",
+        "nnp-primary": "#14161A",
+        "nnp-highlight": "#DD8300",
+        "nnp-muted": "#828282",
+        "nnp-gradient": "#7591A3",
       },
     },
   },

@@ -1,5 +1,6 @@
 import { ReactElement } from "react";
 import { useTranslation } from "next-i18next";
+import LayoutWithNavigation from "@/components/layouts/LayoutWithNavigation";
 
 export default function Home() {
   const { t } = useTranslation();
@@ -15,5 +16,5 @@ export default function Home() {
 }
 
 Home.getLayout = function (page: ReactElement) {
-  return page;
+  return <LayoutWithNavigation>{page}</LayoutWithNavigation>;
 };
