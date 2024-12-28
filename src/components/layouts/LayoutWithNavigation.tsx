@@ -2,7 +2,7 @@ import HomeIcon from "@/components/icons/HomeIcon";
 import SearchIcon from "@/components/icons/SearchIcon";
 import BellIcon from "@/components/icons/BellIcon";
 import HeartIcon from "@/components/icons/HeartIcon";
-import { ReactNode, useEffect, useState } from "react";
+import { ReactNode, useState } from "react";
 import { useRouter } from "next/router";
 import Link from "next/link";
 import NnpLogo from "@/components/icons/NnpLogo";
@@ -12,6 +12,7 @@ import { useTranslation } from "next-i18next";
 
 export default function LayoutWithNavigation({ children }: { children: ReactNode }) {
   const { asPath } = useRouter();
+  const { t } = useTranslation();
   const [sidebarOpened, setSidebarOpened] = useState(() => {
     const sidebarStatus = localStorage.getItem("nnp-sd-status");
     if (!sidebarStatus || sidebarStatus === "false") {
@@ -19,7 +20,6 @@ export default function LayoutWithNavigation({ children }: { children: ReactNode
     }
     return true;
   });
-  const { t } = useTranslation();
 
   const saveSidebarStateInLocalStorage = (state: boolean) => {
     if (typeof window !== "undefined") {
@@ -52,13 +52,13 @@ export default function LayoutWithNavigation({ children }: { children: ReactNode
             <Link href="/" data-active={asPath.toLowerCase() === "/"} className="group flex items-center gap-2">
               <HomeIcon className="stroke-nnp-muted group-data-[active=true]:stroke-nnp-highlight transition-all" />
               <span className="text-nnp-muted group-data-[sidebaropened=false]/sidebar:hidden group-data-[active=true]:text-nnp-highlight group-data-[active=true]:font-bold transition-all">
-                {t("nav.home")}
+                Home
               </span>
             </Link>
             <Link href="/#" data-active={asPath.toLowerCase() === "search"} className="group flex items-center gap-2">
               <SearchIcon className="stroke-nnp-muted group-data-[active=true]:stroke-nnp-highlight transition-all" />
               <span className="text-nnp-muted group-data-[sidebaropened=false]/sidebar:hidden group-data-[active=true]:stroke-nnp-highlight transition-all">
-                {t("nav.search")}
+                Search
               </span>
             </Link>
             <Link
@@ -68,7 +68,7 @@ export default function LayoutWithNavigation({ children }: { children: ReactNode
             >
               <BellIcon className="stroke-nnp-muted group-data-[active=true]:stroke-nnp-highlight transition-all" />
               <span className="text-nnp-muted group-data-[sidebaropened=false]/sidebar:hidden group-data-[active=true]:stroke-nnp-highlight transition-all">
-                {t("nav.notification")}
+                Notifications
               </span>
             </Link>
             <Link
@@ -78,14 +78,12 @@ export default function LayoutWithNavigation({ children }: { children: ReactNode
             >
               <HeartIcon className="stroke-nnp-muted group-data-[active=true]:stroke-nnp-highlight transition-all" />
               <span className="text-nnp-muted group-data-[sidebaropened=false]/sidebar:hidden group-data-[active=true]:stroke-nnp-highlight transition-all">
-                {t("nav.favorite")}
+                Favorites
               </span>
             </Link>
           </div>
         </nav>
-        <div className="w-full px-10">
-          {/*<div className="size-12 bg-gradient-to-tr rounded-full from-nnp-highlight to-nnp-highlight/70" />*/}
-        </div>
+        <div className="w-full px-10"></div>
       </div>
       <div className="overflow-y-auto">{children}</div>
       <div className="fixed bg-gradient-to-br from-nnp-gradient blur-[100px] to-transparent rounded-br-full rounded-tr-full w-1/2 h-1/2 top-0 left-0 -z-10" />
