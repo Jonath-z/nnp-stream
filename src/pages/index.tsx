@@ -74,3 +74,5 @@ export default function Home() {
 Home.getLayout = function (page: ReactElement) {
   return <LayoutWithNavigation>{page}</LayoutWithNavigation>;
 };
+
+

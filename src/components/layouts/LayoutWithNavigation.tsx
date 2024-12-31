@@ -8,6 +8,7 @@ import Link from "next/link";
 import NnpLogo from "@/components/icons/NnpLogo";
 import ArrowIcon from "@/components/icons/Arrow";
 import NnpMinifiedLogo from "@/components/icons/NnpMinifiedLogo";
+import SearchPopup from "@/components/popups/searchBox";
 
 export default function LayoutWithNavigation({ children }: { children: ReactNode }) {
   const { asPath } = useRouter();
@@ -18,6 +19,9 @@ export default function LayoutWithNavigation({ children }: { children: ReactNode
     }
     return true;
   });
+
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
 
   const saveSidebarStateInLocalStorage = (state: boolean) => {
     if (typeof window !== "undefined") {
@@ -31,9 +35,26 @@ export default function LayoutWithNavigation({ children }: { children: ReactNode
       return !prev;
     });
   };
+  const handleSearchClick = () => {
+    setIsSearchOpen(true);
+    setTimeout(() => {
+      const searchInput = document.querySelector("#search-input") as HTMLInputElement;
+      if (searchInput) {
+        searchInput.focus();
+      }
+    }, 0);
+  };
+  const handleSearchClose = () => {
+    setIsSearchOpen(false);
+  };
+
+  const handleSearch = (query: string) => {
+    setSearchQuery(query);
+  };
 
   return (
     <div>
+      <SearchPopup isOpen={isSearchOpen} onClose={handleSearchClose} onSearch={handleSearch} />
       <div
         data-sidebaropened={sidebarOpened}
         className={`fixed group/sidebar h-screen py-8 flex flex-col justify-between items-center bg-nnp-primary/70 backdrop-blur-[80px] transition-width duration-300 ease-[cubic-bezier(0.25, 0.8, 0.25, 1)] ${sidebarOpened ? "w-56 z-50" : "w-22 z-10"}`}
@@ -53,12 +74,12 @@ export default function LayoutWithNavigation({ children }: { children: ReactNode
                 Home
               </span>
             </Link>
-            <Link href="/#" data-active={asPath.toLowerCase() === "search"} className="group flex items-center gap-2">
+            <button onClick={handleSearchClick} data-active={asPath.toLowerCase() === "search"} className="group flex items-center gap-2">
               <SearchIcon className="stroke-nnp-muted group-data-[active=true]:stroke-nnp-highlight transition-all" />
               <span className="text-nnp-muted group-data-[sidebaropened=false]/sidebar:hidden group-data-[active=true]:stroke-nnp-highlight transition-all">
                 Search
               </span>
-            </Link>
+            </button>
             <Link
               href="#"
               data-active={asPath.toLowerCase() === "notifications"}
