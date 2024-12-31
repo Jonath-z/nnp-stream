@@ -9,6 +9,7 @@ import NnpLogo from "@/components/icons/NnpLogo";
 import ArrowIcon from "@/components/icons/Arrow";
 import NnpMinifiedLogo from "@/components/icons/NnpMinifiedLogo";
 import SearchPopup from "@/components/popups/searchBox";
+import { useSearchStore } from "@/stores/useSearchStore";
 
 export default function LayoutWithNavigation({ children }: { children: ReactNode }) {
   const { asPath } = useRouter();
@@ -21,7 +22,9 @@ export default function LayoutWithNavigation({ children }: { children: ReactNode
   });
 
   const [isSearchOpen, setIsSearchOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
+
+  const { searchQuery, setSearchQuery } = useSearchStore();
+
 
   const saveSidebarStateInLocalStorage = (state: boolean) => {
     if (typeof window !== "undefined") {
@@ -50,6 +53,7 @@ export default function LayoutWithNavigation({ children }: { children: ReactNode
 
   const handleSearch = (query: string) => {
     setSearchQuery(query);
+
   };
 
   return (

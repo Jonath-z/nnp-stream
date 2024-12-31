@@ -1,8 +1,9 @@
-import { ReactElement } from "react";
+import { ReactElement, useEffect, useState } from "react";
 import { useTranslation } from "next-i18next";
 import dynamic from "next/dynamic";
 import videos from "@/data/videos";
 import VideoCard from "@/components/cards/VideoCard";
+import { useSearchStore } from "@/stores/useSearchStore";
 
 const LayoutWithNavigation = dynamic(() => import("@/components/layouts/LayoutWithNavigation"), {
   ssr: false,
@@ -11,10 +12,27 @@ const LayoutWithNavigation = dynamic(() => import("@/components/layouts/LayoutWi
 export default function Home() {
   const { t } = useTranslation();
 
+  const { searchQuery } = useSearchStore();
+  const [filteredVideos, setFilteredVideos] = useState(videos);
+
+  useEffect(() => {
+    if (searchQuery) {
+      setFilteredVideos(
+        videos.filter((video) =>
+          video.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          video.description.toLowerCase().includes(searchQuery.toLowerCase()
+        )
+      )
+    );
+    } else {
+      setFilteredVideos(videos);
+    }
+  }, [searchQuery]);
+
   return (
     <div suppressHydrationWarning>
       <div className="flex items-center gap-1">
-        {videos.map((video, index) => {
+        {filteredVideos.map((video, index) => {
           return (
             <VideoCard
               key={`${index}-video`}
@@ -28,7 +46,7 @@ export default function Home() {
 
       <h3 className="text-white font-bold mt-10 pb-3">Coming Soon</h3>
       <div className="flex items-center gap-1">
-        {videos.map((video, index) => {
+        {filteredVideos.map((video, index) => {
           return (
             <VideoCard
               key={`${index}-video`}
@@ -42,7 +60,7 @@ export default function Home() {
 
       <h3 className="text-white font-bold mt-10 pb-3">Podcasts</h3>
       <div className="flex items-center gap-1">
-        {videos.map((video, index) => {
+        {filteredVideos.map((video, index) => {
           return (
             <VideoCard
               key={`${index}-video`}
@@ -56,7 +74,7 @@ export default function Home() {
 
       <h3 className="text-white font-bold mt-10 pb-3">Film</h3>
       <div className="flex items-center gap-1">
-        {videos.map((video, index) => {
+        {filteredVideos.map((video, index) => {
           return (
             <VideoCard
               key={`${index}-video`}
@@ -74,5 +92,4 @@ export default function Home() {
 Home.getLayout = function (page: ReactElement) {
   return <LayoutWithNavigation>{page}</LayoutWithNavigation>;
 };
-
 
