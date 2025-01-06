@@ -1,89 +1,38 @@
-import { ReactElement, useEffect, useState } from "react";
-import { useTranslation } from "next-i18next";
+import { ReactElement, useState } from "react";
 import dynamic from "next/dynamic";
 import videos from "@/data/videos";
-import VideoCard from "@/components/cards/VideoCard";
-import { useSearchStore } from "@/stores/useSearchStore";
+import VideoCategory from "@/components/VideoCategory";
+import SearchBar from "@/components/SearchBar";
 
 const LayoutWithNavigation = dynamic(() => import("@/components/layouts/LayoutWithNavigation"), {
   ssr: false,
 });
 
 export default function Home() {
-  const { t } = useTranslation();
+  const [filteredVideos, setFilteredVideos] = useState(() => videos);
 
-  const { searchQuery } = useSearchStore();
-  const [filteredVideos, setFilteredVideos] = useState(videos);
-
-  useEffect(() => {
-    if (searchQuery) {
+  const onSearchQuery = (query: string) => {
+    if (query) {
       setFilteredVideos(
-        videos.filter((video) =>
-          video.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          video.description.toLowerCase().includes(searchQuery.toLowerCase()
-        )
-      )
-    );
+        videos.filter(
+          (video) =>
+            video.title.toLowerCase().includes(query.toLowerCase()) ||
+            video.description.toLowerCase().includes(query.toLowerCase()),
+        ),
+      );
     } else {
       setFilteredVideos(videos);
     }
-  }, [searchQuery]);
+  };
 
   return (
     <div suppressHydrationWarning>
-      <div className="flex items-center gap-1">
-        {filteredVideos.map((video, index) => {
-          return (
-            <VideoCard
-              key={`${index}-video`}
-              videoCoverUrl={video.coverUrl}
-              videoTitle={video.title}
-              videoDescription={video.description}
-            />
-          );
-        })}
-      </div>
-
-      <h3 className="text-white font-bold mt-10 pb-3">Coming Soon</h3>
-      <div className="flex items-center gap-1">
-        {filteredVideos.map((video, index) => {
-          return (
-            <VideoCard
-              key={`${index}-video`}
-              videoCoverUrl={video.coverUrl}
-              videoTitle={video.title}
-              videoDescription={video.description}
-            />
-          );
-        })}
-      </div>
-
-      <h3 className="text-white font-bold mt-10 pb-3">Podcasts</h3>
-      <div className="flex items-center gap-1">
-        {filteredVideos.map((video, index) => {
-          return (
-            <VideoCard
-              key={`${index}-video`}
-              videoCoverUrl={video.coverUrl}
-              videoTitle={video.title}
-              videoDescription={video.description}
-            />
-          );
-        })}
-      </div>
-
-      <h3 className="text-white font-bold mt-10 pb-3">Film</h3>
-      <div className="flex items-center gap-1">
-        {filteredVideos.map((video, index) => {
-          return (
-            <VideoCard
-              key={`${index}-video`}
-              videoCoverUrl={video.coverUrl}
-              videoTitle={video.title}
-              videoDescription={video.description}
-            />
-          );
-        })}
+      <SearchBar onChange={(e) => setTimeout(() => onSearchQuery(e.target.value), 500)} />
+      <div className="mt-5 w-fit mx-auto">
+        <VideoCategory categoryName="You might also like" videos={filteredVideos} />
+        <VideoCategory categoryName="Coming Soon" videos={filteredVideos} />
+        <VideoCategory categoryName="Podcasts" videos={filteredVideos} />
+        <VideoCategory categoryName="Film" videos={filteredVideos} />
       </div>
     </div>
   );
@@ -92,4 +41,3 @@ export default function Home() {
 Home.getLayout = function (page: ReactElement) {
   return <LayoutWithNavigation>{page}</LayoutWithNavigation>;
 };
-

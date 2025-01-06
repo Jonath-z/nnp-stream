@@ -2,17 +2,17 @@ import HomeIcon from "@/components/icons/HomeIcon";
 import SearchIcon from "@/components/icons/SearchIcon";
 import BellIcon from "@/components/icons/BellIcon";
 import HeartIcon from "@/components/icons/HeartIcon";
-import { ReactNode, useState } from "react";
+import { ReactNode, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/router";
 import Link from "next/link";
 import NnpLogo from "@/components/icons/NnpLogo";
 import ArrowIcon from "@/components/icons/Arrow";
 import NnpMinifiedLogo from "@/components/icons/NnpMinifiedLogo";
-import SearchPopup from "@/components/popups/searchBox";
-import { useSearchStore } from "@/stores/useSearchStore";
 
 export default function LayoutWithNavigation({ children }: { children: ReactNode }) {
   const { asPath } = useRouter();
+  const sideBarRef = useRef<HTMLDivElement>(null);
+  const [sidebarWidth, setSidebarWidth] = useState(() => sideBarRef.current?.offsetWidth || 0);
   const [sidebarOpened, setSidebarOpened] = useState(() => {
     const sidebarStatus = localStorage.getItem("nnp-sd-status");
     if (!sidebarStatus || sidebarStatus === "false") {
@@ -20,11 +20,6 @@ export default function LayoutWithNavigation({ children }: { children: ReactNode
     }
     return true;
   });
-
-  const [isSearchOpen, setIsSearchOpen] = useState(false);
-
-  const { searchQuery, setSearchQuery } = useSearchStore();
-
 
   const saveSidebarStateInLocalStorage = (state: boolean) => {
     if (typeof window !== "undefined") {
@@ -34,32 +29,23 @@ export default function LayoutWithNavigation({ children }: { children: ReactNode
 
   const toggleSidebar = () => {
     setSidebarOpened((prev) => {
+      console.log({ width: sideBarRef.current?.offsetWidth });
+      setSidebarWidth(sideBarRef.current?.offsetWidth || 0);
       saveSidebarStateInLocalStorage(!prev);
       return !prev;
     });
   };
-  const handleSearchClick = () => {
-    setIsSearchOpen(true);
-    setTimeout(() => {
-      const searchInput = document.querySelector("#search-input") as HTMLInputElement;
-      if (searchInput) {
-        searchInput.focus();
-      }
-    }, 0);
-  };
-  const handleSearchClose = () => {
-    setIsSearchOpen(false);
-  };
 
-  const handleSearch = (query: string) => {
-    setSearchQuery(query);
+  useEffect(() => {
+    setSidebarWidth(sideBarRef.current?.offsetWidth || 0);
+  }, []);
 
-  };
+  const handleSearchClick = () => {};
 
   return (
-    <div>
-      <SearchPopup isOpen={isSearchOpen} onClose={handleSearchClose} onSearch={handleSearch} />
+    <div className="flex">
       <div
+        ref={sideBarRef}
         data-sidebaropened={sidebarOpened}
         className={`fixed group/sidebar h-screen py-8 flex flex-col justify-between items-center bg-nnp-primary/70 backdrop-blur-[80px] transition-width duration-300 ease-[cubic-bezier(0.25, 0.8, 0.25, 1)] ${sidebarOpened ? "w-56 z-50" : "w-22 z-10"}`}
       >
@@ -78,7 +64,11 @@ export default function LayoutWithNavigation({ children }: { children: ReactNode
                 Home
               </span>
             </Link>
-            <button onClick={handleSearchClick} data-active={asPath.toLowerCase() === "search"} className="group flex items-center gap-2">
+            <button
+              onClick={handleSearchClick}
+              data-active={asPath.toLowerCase() === "search"}
+              className="group flex items-center gap-2"
+            >
               <SearchIcon className="stroke-nnp-muted group-data-[active=true]:stroke-nnp-highlight transition-all" />
               <span className="text-nnp-muted group-data-[sidebaropened=false]/sidebar:hidden group-data-[active=true]:stroke-nnp-highlight transition-all">
                 Search
@@ -108,10 +98,17 @@ export default function LayoutWithNavigation({ children }: { children: ReactNode
         </nav>
         <div className="w-full px-10"></div>
       </div>
-      <div className="overflow-y-auto w-fit mx-auto py-20 flex-1">{children}</div>
+      <div
+        style={{
+          // This is the sidebar width when expended and when close w-56 and w-22
+          marginLeft: sidebarOpened ? 224 : 80,
+        }}
+        className="overflow-y-auto w-full pb-20 flex-1 transition-[margin]"
+      >
+        {children}
+      </div>
       <div className="fixed bg-gradient-to-br from-nnp-gradient blur-[100px] to-transparent rounded-br-full rounded-tr-full w-1/2 h-1/2 top-0 left-0 -z-10" />
       <div className="fixed bg-gradient-to-br from-nnp-gradient blur-[100px] to-transparent rounded-br-full rounded-tr-full w-1/2 h-28 bottom-0 left-0 -mb-20 -z-10" />
     </div>
   );
 }
-
