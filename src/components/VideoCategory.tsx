@@ -5,7 +5,7 @@ export default function VideoCategory({ categoryName, videos }: { categoryName: 
   if (videos.length === 0) return <></>;
   return (
     <div>
-      <h3 className="text-white font-bold mt-10 pb-3">{categoryName}</h3>
+      <h3 className="text-white font-bold pb-3">{categoryName}</h3>
       <div className="flex items-center gap-1">
         {videos.map((video, index) => {
           return (

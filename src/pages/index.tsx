@@ -3,6 +3,7 @@ import dynamic from "next/dynamic";
 import videos from "@/data/videos";
 import VideoCategory from "@/components/VideoCategory";
 import SearchBar from "@/components/SearchBar";
+import VideoFilter from "@/components/VideoFilter";
 
 const LayoutWithNavigation = dynamic(() => import("@/components/layouts/LayoutWithNavigation"), {
   ssr: false,
@@ -28,7 +29,9 @@ export default function Home() {
   return (
     <div suppressHydrationWarning>
       <SearchBar onChange={(e) => setTimeout(() => onSearchQuery(e.target.value), 500)} />
-      <div className="mt-5 w-fit mx-auto">
+
+      <div className="mt-5 w-fit mx-auto space-y-10 ">
+        <VideoFilter />
         <VideoCategory categoryName="You might also like" videos={filteredVideos} />
         <VideoCategory categoryName="Coming Soon" videos={filteredVideos} />
         <VideoCategory categoryName="Podcasts" videos={filteredVideos} />

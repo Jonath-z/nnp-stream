@@ -100,7 +100,7 @@ export default function LayoutWithNavigation({ children }: { children: ReactNode
       </div>
       <div
         style={{
-          // This is the sidebar width when expended and when close w-56 and w-22
+          // This is the sidebar width when expended and closed (w-56 and w-22)
           marginLeft: sidebarOpened ? 224 : 80,
         }}
         className="overflow-y-auto w-full pb-20 flex-1 transition-[margin]"
