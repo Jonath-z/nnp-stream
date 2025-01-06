@@ -14,7 +14,7 @@ export default function LayoutWithNavigation({ children }: { children: ReactNode
   const sideBarRef = useRef<HTMLDivElement>(null);
   const [sidebarWidth, setSidebarWidth] = useState(() => sideBarRef.current?.offsetWidth || 0);
   const [sidebarOpened, setSidebarOpened] = useState(() => {
-    const sidebarStatus = localStorage.getItem("nnp-sd-status");
+    const sidebarStatus = typeof window !== "undefined" ? localStorage.getItem("nnp-sd-status") : false;
     if (!sidebarStatus || sidebarStatus === "false") {
       return false;
     }

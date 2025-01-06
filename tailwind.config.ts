@@ -25,6 +25,15 @@ export default {
         "nnp-muted": "#828282",
         "nnp-gradient": "#7591A3",
       },
+      keyframes: {
+        zoomIn: {
+          "0%": { transform: "scale(1.05)" },
+          "100%": { transform: "scale(1)" },
+        },
+      },
+      animation: {
+        zoomIn: "zoomIn 1s ease-out", // Adjust duration and easing as needed
+      },
     },
   },
   plugins: [],
