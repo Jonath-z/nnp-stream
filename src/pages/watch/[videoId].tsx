@@ -25,6 +25,7 @@ export default function WatchPage() {
       <div className="flex gap-5 mt-10 ml-10">
         <div className="w-4/6">
           <WistiaPlayer
+            key={router.query.videoId as string}
             className="object-cover"
             qualityControl
             mediaId="w8ltk08dbs"
@@ -55,7 +56,7 @@ export default function WatchPage() {
           </div>
           <div className="flex-1 flex flex-col gap-2 w-full">
             {[...videos, ...videos].map(({ title, coverUrl, description, categories }, index) => (
-              <div className="flex w-full gap-3">
+              <div className="flex w-full gap-3" onClick={() => router.push(`/watch/${index}`)}>
                 <div key={`related-video-watch-${index}`} className="relative w-48 h-28 rounded-md cursor-pointer">
                   <div className="absolute w-full h-full">
                     <Image src={coverUrl} alt="" fill className="object-cover rounded-md" />
