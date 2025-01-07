@@ -1,36 +1,53 @@
-import { ReactElement, useEffect } from "react";
+import { ReactElement, useState } from "react";
 import LayoutWithNavigation from "@/components/layouts/LayoutWithNavigation";
 import { WistiaPlayer } from "@wistia/wistia-player-react";
 import videos from "@/data/videos";
-import VideoCard from "@/components/cards/VideoCard";
 import { useRouter } from "next/router";
 import Image from "next/image";
 import SearchBar from "@/components/SearchBar";
 import VideoFilter from "@/components/VideoFilter";
-import { useQuery } from "@tanstack/react-query";
-import wistia from "@/services/wistia";
+// @ts-ignore
+import { WistiaPlayerCustomEvent } from "@wistia/wistia-player-react/dist/cjs/types/types/index";
+import dayjs from "dayjs";
+import relativeTime from "dayjs/plugin/relativeTime";
+import duration from "dayjs/plugin/duration";
+
+dayjs.extend(relativeTime);
+dayjs.extend(duration);
 
 export default function WatchPage() {
   const router = useRouter();
-
-  const { data, error } = useQuery({
-    queryKey: ["GetMediadata"],
-    queryFn: () => wistia.getMediaMediaData("w8ltk08dbs"),
-    refetchOnWindowFocus: false,
-    refetchOnMount: false,
-    retry: false,
-  });
-
-  useEffect(() => {
-    console.log({ data, error });
-  }, [data, error]);
+  const [videoData, setVideoData] = useState<WistiaPlayerCustomEvent>(null);
 
   return (
     <div>
       <SearchBar />
       <div className="flex gap-5 mt-10 ml-10">
         <div className="w-4/6">
-          <WistiaPlayer qualityControl mediaId="w8ltk08dbs" />
+          <WistiaPlayer
+            className="object-cover"
+            qualityControl
+            mediaId="w8ltk08dbs"
+            onLoadedMediaData={(data) => {
+              setVideoData(data);
+            }}
+          />
+          <div className="mt-3">
+            <h3 className="text-white font-bold text-xl">{videoData?.detail.mediaData?.name}</h3>
+            <div className="flex items-center gap-4 bg-nnp-primary rounded-sm p-2 mt-2">
+              <p className="flex items-center gap-1">
+                <span className="text-white text-xs font-semibold">
+                  {videoData?.detail.mediaData?.stats.uniqueLoadCount}{" "}
+                </span>
+                <span className="text-white text-xs font-semibold">
+                  {videoData && videoData?.detail.mediaData?.stats.uniqueLoadCount > 1 ? "Views" : "View"}
+                </span>
+              </p>
+              <p className="text-white m-0 text-xs font-semibold">
+                Posted {dayjs(videoData?.detail.mediaData.createdAt * 1000).fromNow()}
+              </p>
+            </div>
+          </div>
         </div>
         <div>
           <div className="mb-5">
