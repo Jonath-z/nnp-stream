@@ -6,6 +6,7 @@ import { useRouter } from "next/router";
 import VideoCategory from "@/components/VideoCategory";
 import PlayIcon from "@/components/icons/PlayIcon";
 import HeartIcon from "@/components/icons/HeartIcon";
+import Carousel from "@/components/emblaCarousel/Carousel";
 
 export default function VideoInfo() {
   const router = useRouter();
@@ -22,9 +23,9 @@ export default function VideoInfo() {
             fill
             className="object-cover animate-zoomIn"
           />
-          <div className="absolute bottom-0 z-50 h-full w-full bg-gradient-to-t from-black" />
+          <div className="absolute bottom-0 z-50 h-full w-full bg-gradient-to-t from-black via-black/80" />
         </div>
-        <div className="flex justify-center items-end w-full h-[80dvh] relative ">
+        <div className="flex justify-center items-end w-full h-[66dvh] relative ">
           <div className="flex flex-col relative text-white ml-auto w-full p-5 gap-5 md:w-1/2 lg:w-[45%]">
             <h3 className="text-2xl text-white font-bold">{currentVideo.title}</h3>
             <div className="flex gap-2">
@@ -51,8 +52,9 @@ export default function VideoInfo() {
           </div>
         </div>
       </div>
-      <div className="mx-auto w-fit">
-        <VideoCategory categoryName="Podcasts" videos={videos} />
+      <div className="mx-auto w-fit mt-5">
+        {/*<VideoCategory categoryName="Podcasts" videos={videos} />*/}
+        <Carousel videos={[...videos, ...videos]} />
       </div>
     </div>
   );
