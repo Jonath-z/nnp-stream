@@ -3,10 +3,10 @@ import LayoutWithNavigation from "@/components/layouts/LayoutWithNavigation";
 import Image from "next/image";
 import videos from "@/data/videos";
 import { useRouter } from "next/router";
-import VideoCategory from "@/components/VideoCategory";
 import PlayIcon from "@/components/icons/PlayIcon";
 import HeartIcon from "@/components/icons/HeartIcon";
 import Carousel from "@/components/emblaCarousel/Carousel";
+import Link from "next/link";
 
 export default function VideoInfo() {
   const router = useRouter();
@@ -41,10 +41,13 @@ export default function VideoInfo() {
               with the alien Scavs,
             </p>
             <div className="flex gap-2">
-              <button className="bg-nnp-highlight px-5 py-2 rounded-md font-bold text-black flex items-center gap-2">
+              <Link
+                href={`/watch/${router.query.slug}`}
+                className="bg-nnp-highlight px-5 py-2 rounded-md font-bold text-black flex items-center gap-2"
+              >
                 <span>Watch now</span>
                 <PlayIcon className="fill-black size-5" />
-              </button>
+              </Link>
               <button className="bg-white/10 py-1 px-2 rounded-md">
                 <HeartIcon className="fill-white" />
               </button>

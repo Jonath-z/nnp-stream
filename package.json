@@ -11,6 +11,8 @@
   "dependencies": {
     "@tanstack/react-query": "^5.62.11",
     "@wistia/wistia-player": "^0.0.80",
+    "@wistia/wistia-player-react": "^0.0.81",
+    "axios": "^1.7.9",
     "clsx": "^2.1.1",
     "embla-carousel": "^8.5.1",
     "embla-carousel-react": "^8.5.1",

@@ -19,7 +19,7 @@ export default function VideoFilter({ onSelectFilter }: { onSelectFilter?: ([]: 
   };
 
   return (
-    <div className="mt-16">
+    <div>
       <div className="flex gap-2 items-center">
         {videoCategory.map((category) => (
           <button
