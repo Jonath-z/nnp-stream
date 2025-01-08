@@ -39,6 +39,13 @@ const videos: Video[] = [
     categories: ["actu", "serie"],
     type: "actu",
   },
+  {
+    title: "What'up NNP\nMac Mini M4",
+    description: "2024 Actu",
+    coverUrl: "/images/whatup-NNP.jpg",
+    categories: ["actu", "serie"],
+    type: "actu",
+  },
 ];
 
 export default videos;
