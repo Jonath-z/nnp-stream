@@ -20,7 +20,7 @@ export default function VideoFilter({ onSelectFilter }: { onSelectFilter?: ([]: 
 
   return (
     <div>
-      <div className="flex gap-2 items-center">
+      <div className="flex gap-2 items-center w-full overflow-x-auto">
         {videoCategory.map((category) => (
           <button
             onClick={(e) => {
@@ -28,7 +28,7 @@ export default function VideoFilter({ onSelectFilter }: { onSelectFilter?: ([]: 
               onFilter(category);
             }}
             className={cn(
-              "text-white bg-white/10 py-1 px-2 text-[10px] rounded-sm font-semibold uppercase",
+              "text-white bg-white/10 py-1 px-2 text-[10px] rounded-sm font-semibold uppercase shrink-0",
               selectedFilter.includes(category) ? "bg-nnp-highlight" : "",
             )}
           >

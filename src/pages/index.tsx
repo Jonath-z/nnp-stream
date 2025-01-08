@@ -4,6 +4,7 @@ import videos from "@/data/videos";
 import VideoCategory from "@/components/VideoCategory";
 import SearchBar from "@/components/SearchBar";
 import VideoFilter from "@/components/VideoFilter";
+import NnpMinifiedLogo from "@/components/icons/NnpMinifiedLogo";
 
 const LayoutWithNavigation = dynamic(() => import("@/components/layouts/LayoutWithNavigation"), {
   ssr: false,
@@ -28,10 +29,11 @@ export default function Home() {
 
   return (
     <div suppressHydrationWarning>
-      <SearchBar onChange={(e) => setTimeout(() => onSearchQuery(e.target.value), 500)} />
-
-      <div className="mt-5 w-fit mx-auto space-y-10 ">
-        <div className="mt-32">
+      <div>
+        <SearchBar onChange={(e) => setTimeout(() => onSearchQuery(e.target.value), 500)} />
+      </div>
+      <div className="mt-5 w-full lg:mx-auto space-y-5 lg:space-y-10 px-3">
+        <div className="mt-20 lg:mt-32">
           <VideoFilter />
         </div>
         <VideoCategory categoryName="You might also like" videos={filteredVideos} />

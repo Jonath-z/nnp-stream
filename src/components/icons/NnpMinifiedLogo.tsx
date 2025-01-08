@@ -1,4 +1,6 @@
-export default function NnpMinifiedLogo() {
+import { ComponentProps } from "react";
+
+export default function NnpMinifiedLogo(props: ComponentProps<"svg">) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -7,6 +9,7 @@ export default function NnpMinifiedLogo() {
       height="31"
       viewBox="0 0 21 31"
       fill="none"
+      {...props}
     >
       <rect width="21" height="31" fill="url(#pattern0_28_322)" />
       <defs>

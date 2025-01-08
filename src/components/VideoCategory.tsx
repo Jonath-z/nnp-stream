@@ -9,7 +9,7 @@ export default function VideoCategory({ categoryName, videos }: { categoryName: 
   return (
     <div className="flex flex-col">
       <h3 className="text-white font-bold pb-3 z-10">{categoryName}</h3>
-      <div className="flex items-center gap-1">
+      <div className="flex overflow-x-scroll w-full scrollbar-hide items-center gap-1">
         {videos.map((video, index) => {
           return (
             <VideoCard

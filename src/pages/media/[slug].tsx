@@ -36,7 +36,7 @@ export default function VideoInfo() {
               ))}
             </div>
             <p>{currentVideo.description}</p>
-            <p className="w-96">
+            <p className="w-full lg:w-96">
               One of the few remaining drone repairmen assigned to Earth, its surface devastated after decades of war
               with the alien Scavs,
             </p>
@@ -55,7 +55,7 @@ export default function VideoInfo() {
           </div>
         </div>
       </div>
-      <div className="mx-auto w-fit mt-5">
+      <div className="mx-auto w-full lg:w-fit mt-5">
         {/*<VideoCategory categoryName="Podcasts" videos={videos} />*/}
         <Carousel videos={[...videos, ...videos]} />
       </div>

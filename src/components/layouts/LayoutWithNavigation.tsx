@@ -47,7 +47,7 @@ export default function LayoutWithNavigation({ children }: { children: ReactNode
       <div
         ref={sideBarRef}
         data-sidebaropened={sidebarOpened}
-        className={`fixed group/sidebar h-screen py-8 flex flex-col justify-between items-center bg-nnp-primary/70 backdrop-blur-[80px] transition-width duration-300 ease-[cubic-bezier(0.25, 0.8, 0.25, 1)] ${sidebarOpened ? "w-56 z-50" : "w-22 z-10"}`}
+        className={`fixed group/sidebar hidden z-50 lg:flex h-screen py-8 flex-col justify-between items-center bg-nnp-primary/70 backdrop-blur-[80px] transition-width duration-300 ease-[cubic-bezier(0.25, 0.8, 0.25, 1)] ${sidebarOpened ? "w-56 z-50" : "w-22 z-10"}`}
       >
         {sidebarOpened ? <NnpLogo /> : <NnpMinifiedLogo />}
         <button
@@ -103,7 +103,7 @@ export default function LayoutWithNavigation({ children }: { children: ReactNode
           // This is the sidebar width when expended and closed (w-56 and w-22)
           marginLeft: sidebarOpened ? 224 : 80,
         }}
-        className="overflow-y-auto w-full pb-20 flex-1 transition-[margin]"
+        className="overflow-y-auto w-full pb-20 flex-1 transition-[margin] max-lg:!ml-0 lg:mx-10"
       >
         {children}
       </div>
