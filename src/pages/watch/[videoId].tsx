@@ -11,6 +11,7 @@ import { WistiaPlayerCustomEvent } from "@wistia/wistia-player-react/dist/cjs/ty
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import duration from "dayjs/plugin/duration";
+import WatchVideoCard from "@/components/cards/WatchVideoCard";
 
 dayjs.extend(relativeTime);
 dayjs.extend(duration);
@@ -22,9 +23,10 @@ export default function WatchPage() {
   return (
     <div>
       <SearchBar />
-      <div className="flex gap-5 mt-10 ml-10">
-        <div className="w-4/6">
+      <div className="flex gap-5 mt-10 mx-10">
+        <div className="w-4/6 sticky top-32">
           <WistiaPlayer
+            swatch
             key={router.query.videoId as string}
             className="object-cover"
             qualityControl
@@ -34,39 +36,52 @@ export default function WatchPage() {
             }}
           />
           <div className="mt-3">
-            <h3 className="text-white font-bold text-xl">{videoData?.detail.mediaData?.name}</h3>
-            <div className="flex items-center gap-4 bg-nnp-primary rounded-sm p-2 mt-2">
-              <p className="flex items-center gap-1">
-                <span className="text-white text-xs font-semibold">
-                  {videoData?.detail.mediaData?.stats.uniqueLoadCount}{" "}
+            <div className="flex justify-between items-center">
+              <h3 className="text-white font-bold text-xl md:max-w-80">{videoData?.detail.mediaData?.name}</h3>
+              <div className="flex items-center gap-5">
+                <span className="text-white font-medium">
+                  {videoData && videoData?.detail.mediaData?.stats.uniquePlayCount > 1
+                    ? `${videoData?.detail.mediaData?.stats.uniquePlayCount} Views`
+                    : `${videoData?.detail.mediaData?.stats.uniquePlayCount} View`}
                 </span>
-                <span className="text-white text-xs font-semibold">
-                  {videoData && videoData?.detail.mediaData?.stats.uniqueLoadCount > 1 ? "Views" : "View"}
-                </span>
-              </p>
-              <p className="text-white m-0 text-xs font-semibold">
-                Posted {dayjs(videoData?.detail.mediaData.createdAt * 1000).fromNow()}
-              </p>
+                <p className="text-white m-0 font-medium">
+                  Posted {dayjs(videoData?.detail.mediaData.createdAt * 1000).fromNow()}
+                </p>
+              </div>
             </div>
+            <p className="flex items-center gap-4 bg-nnp-primary-dark text-white font-medium rounded-xl p-8 mt-3">
+              {videoData?.detail.mediaData.seoDescription}
+            </p>
           </div>
         </div>
-        <div>
-          <div className="mb-5">
+        <div className="flex-1 overflow-x-auto">
+          <div className="mb-5 flex overflow-x-auto max-w-full">
             <VideoFilter />
           </div>
-          <div className="flex-1 flex flex-col gap-2 w-full">
-            {[...videos, ...videos].map(({ title, coverUrl, description, categories }, index) => (
-              <div className="flex w-full gap-3" onClick={() => router.push(`/watch/${index}`)}>
-                <div key={`related-video-watch-${index}`} className="relative w-48 h-28 rounded-md cursor-pointer">
-                  <div className="absolute w-full h-full">
-                    <Image src={coverUrl} alt="" fill className="object-cover rounded-md" />
-                  </div>
-                </div>
-                <div className="flex flex-col justify-end items-start">
-                  <b className="text-white whitespace-pre-wrap">{title}</b>
-                  <p className="text-white font-medium text-xs">{description}</p>
-                </div>
-              </div>
+          <div className="flex flex-col gap-2 w-full bg-nnp-background/75 p-8 rounded-xl">
+            {[...videos].map(({ title, coverUrl, description, categories }, index) => (
+              <WatchVideoCard
+                key={`video-watch-${index}`}
+                onClick={() => router.push(`/watch/${index}`)}
+                categories={categories}
+                videoDescription={description}
+                videoCoverUrl={coverUrl}
+                videoTitle={title}
+              />
+            ))}
+          </div>
+          <hr className="my-5" />
+          <div className="flex flex-col gap-2">
+            <h3 className="text-white font-bold text-xs mb-2">You might also like this</h3>
+            {[...videos].map(({ title, coverUrl, description, categories }, index) => (
+              <WatchVideoCard
+                key={`video-watch-${index}`}
+                onClick={() => router.push(`/watch/${index}`)}
+                categories={categories}
+                videoDescription={description}
+                videoCoverUrl={coverUrl}
+                videoTitle={title}
+              />
             ))}
           </div>
         </div>

@@ -24,6 +24,9 @@ export default {
         "nnp-highlight": "#DD8300",
         "nnp-muted": "#828282",
         "nnp-gradient": "#7591A3",
+        "nnp-background": "#23292F",
+        "nnp-light-gray": "#BBBBBB",
+        "nnp-primary-dark": "#20242A",
       },
       keyframes: {
         zoomIn: {
