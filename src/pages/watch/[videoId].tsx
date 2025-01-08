@@ -23,7 +23,7 @@ export default function WatchPage() {
   return (
     <div>
       <SearchBar />
-      <div className="flex gap-5 mt-10 mx-10">
+      <div className="flex gap-5 mt-32 mx-10">
         <div className="w-4/6 sticky top-32">
           <WistiaPlayer
             swatch

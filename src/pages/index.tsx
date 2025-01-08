@@ -31,7 +31,7 @@ export default function Home() {
       <SearchBar onChange={(e) => setTimeout(() => onSearchQuery(e.target.value), 500)} />
 
       <div className="mt-5 w-fit mx-auto space-y-10 ">
-        <div className="mt-16">
+        <div className="mt-32">
           <VideoFilter />
         </div>
         <VideoCategory categoryName="You might also like" videos={filteredVideos} />
