@@ -49,7 +49,7 @@ export default function LayoutWithNavigation({ children }: { children: ReactNode
         data-sidebaropened={sidebarOpened}
         className={`fixed group/sidebar hidden z-50 lg:flex h-screen py-8 flex-col justify-between items-center bg-nnp-primary/70 backdrop-blur-[80px] transition-width duration-300 ease-[cubic-bezier(0.25, 0.8, 0.25, 1)] ${sidebarOpened ? "w-56 z-50" : "w-22 z-10"}`}
       >
-        {sidebarOpened ? <NnpLogo /> : <NnpMinifiedLogo />}
+        <Link href="/">{sidebarOpened ? <NnpLogo /> : <NnpMinifiedLogo />}</Link>
         <button
           onClick={toggleSidebar}
           className="absolute bg-nnp-primary/70 right-0 top-1/2 -mr-7 w-7 h-16 flex items-center justify-center rounded-r-md z-50"
