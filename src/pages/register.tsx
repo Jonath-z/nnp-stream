@@ -16,6 +16,7 @@ export default function Register() {
       setIsLoading(true);
       await saveUserEmail(email);
       setIsLoading(false);
+      localStorage.setItem("nnp-stream-email", email);
       setEmail("");
       router.push("/");
     } catch (err) {
