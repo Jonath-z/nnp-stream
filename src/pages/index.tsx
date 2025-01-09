@@ -32,7 +32,7 @@ export default function Home() {
       <div>
         <SearchBar onChange={(e) => setTimeout(() => onSearchQuery(e.target.value), 500)} />
       </div>
-      <div className="mt-5 w-full  lg:mx-auto space-y-5 lg:space-y-10 px-3">
+      <div className="mt-5 w-full max-w-screen-xl lg:mx-auto space-y-5 lg:space-y-10 px-3">
         <div className="mt-20 lg:mt-32">
           <VideoFilter />
         </div>
