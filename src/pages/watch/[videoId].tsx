@@ -12,11 +12,21 @@ import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import duration from "dayjs/plugin/duration";
 import WatchVideoCard from "@/components/cards/WatchVideoCard";
+import { GetServerSidePropsContext } from "next";
+import { createPagesServerClient } from "@supabase/auth-helpers-nextjs";
+import { Tables } from "@/services/supabase";
+import { SavedVideo } from "@/utils/type";
 
 dayjs.extend(relativeTime);
 dayjs.extend(duration);
 
-export default function WatchPage() {
+export default function WatchPage({
+  currentVideo,
+  relatedVideos,
+}: {
+  currentVideo: SavedVideo;
+  relatedVideos: SavedVideo[];
+}) {
   const router = useRouter();
   const [videoData, setVideoData] = useState<WistiaPlayerCustomEvent>(null);
 
@@ -27,10 +37,10 @@ export default function WatchPage() {
         <div className="max-lg:w-full w-4/6">
           <WistiaPlayer
             swatch
-            key={router.query.videoId as string}
+            key={currentVideo.id}
             className="object-cover"
             qualityControl
-            mediaId="w8ltk08dbs"
+            mediaId={currentVideo.wistia_id}
             onLoadedMediaData={(data) => {
               setVideoData(data);
             }}
@@ -61,31 +71,32 @@ export default function WatchPage() {
             <VideoFilter />
           </div>
           <div className="flex flex-col gap-2 w-full bg-nnp-background/75 p-8 max-lg:p-4 rounded-xl">
-            {[...videos].map(({ title, coverUrl, description, categories }, index) => (
+            {relatedVideos.map(({ title, cover_url, description, categories, id, duration }, index) => (
               <WatchVideoCard
-                key={`video-watch-${index}`}
-                onClick={() => router.push(`/watch/${index}`)}
-                categories={categories}
+                key={id}
+                onClick={() => router.push(`/watch/${id}`)}
+                categories={categories.split(",")}
                 videoDescription={description}
-                videoCoverUrl={coverUrl}
+                videoCoverUrl={cover_url}
                 videoTitle={title}
+                duration={duration}
               />
             ))}
           </div>
-          <hr className="my-5" />
-          <div className="flex flex-col gap-2">
-            <h3 className="text-white font-bold text-xs mb-2">You might also like this</h3>
-            {[...videos].map(({ title, coverUrl, description, categories }, index) => (
-              <WatchVideoCard
-                key={`video-watch-${index}`}
-                onClick={() => router.push(`/watch/${index}`)}
-                categories={categories}
-                videoDescription={description}
-                videoCoverUrl={coverUrl}
-                videoTitle={title}
-              />
-            ))}
-          </div>
+          {/*<hr className="my-5" />*/}
+          {/*<div className="flex flex-col gap-2">*/}
+          {/*  <h3 className="text-white font-bold text-xs mb-2">You might also like this</h3>*/}
+          {/*  {[...videos].map(({ title, coverUrl, description, categories }, index) => (*/}
+          {/*    <WatchVideoCard*/}
+          {/*      key={`video-watch-${index}`}*/}
+          {/*      onClick={() => router.push(`/watch/${index}`)}*/}
+          {/*      categories={categories}*/}
+          {/*      videoDescription={description}*/}
+          {/*      videoCoverUrl={coverUrl}*/}
+          {/*      videoTitle={title}*/}
+          {/*    />*/}
+          {/*  ))}*/}
+          {/*</div>*/}
         </div>
       </div>
     </div>
@@ -95,3 +106,44 @@ export default function WatchPage() {
 WatchPage.getLayout = function (page: ReactElement) {
   return <LayoutWithNavigation>{page}</LayoutWithNavigation>;
 };
+
+export async function getServerSideProps(ctx: GetServerSidePropsContext) {
+  const supabase = createPagesServerClient(ctx);
+  const videoId = ctx.query.videoId as string;
+  console.log({ query: ctx.query });
+  if (!videoId) {
+    return {
+      redirect: {
+        destination: "/",
+        permanent: true,
+      },
+    };
+  }
+
+  const { data: currentVideo } = await supabase
+    .from(Tables.VIDEOS)
+    .select<any, SavedVideo>("*")
+    .eq("id", videoId)
+    .single();
+
+  if (!currentVideo) {
+    return {
+      redirect: {
+        destination: "/",
+        permanent: true,
+      },
+    };
+  }
+
+  const { data: relatedVideos } = await supabase
+    .from(Tables.VIDEOS)
+    .select<any, SavedVideo>("*")
+    .neq("id", currentVideo?.id);
+
+  return {
+    props: {
+      currentVideo,
+      relatedVideos: !relatedVideos ? [] : relatedVideos,
+    },
+  };
+}

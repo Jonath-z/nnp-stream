@@ -8,4 +8,5 @@ export type SavedVideo = {
   cover_url: string;
   categories: string;
   type: Category;
+  duration: string;
 };
