@@ -41,7 +41,7 @@ export default function VideoInfo({
             bigPlayButton={false}
             fullscreenControl={false}
             key={router.query.videoId as string}
-            className="object-cover max-lg:h-fit h-full w-full"
+            className="object-cover max-lg:h-fit"
             mediaId={currentVideo?.wistia_id}
           />
           <div className="absolute bottom-0 z-50 h-full w-full bg-gradient-to-t from-black via-black/90 max-lg:to-black/80" />
