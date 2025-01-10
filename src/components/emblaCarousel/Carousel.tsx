@@ -2,13 +2,13 @@ import React from "react";
 import { EmblaOptionsType } from "embla-carousel";
 import { PrevButton, NextButton, usePrevNextButtons } from "./CarouselButtons";
 import useEmblaCarousel from "embla-carousel-react";
-import Videos from "@/data/videos";
 import VideoCard from "@/components/cards/VideoCard";
 import { useRouter } from "next/router";
 import { WheelGesturesPlugin } from "embla-carousel-wheel-gestures";
+import { SavedVideo } from "@/utils/type";
 
 type PropType = {
-  videos: typeof Videos;
+  videos: SavedVideo[];
   options?: EmblaOptionsType;
 };
 
@@ -27,8 +27,8 @@ export default function Carousel(props: PropType) {
             return (
               <div key={`${index}-video`} className="embla__slide">
                 <VideoCard
-                  onClick={() => router.push(`/media/${index}`)}
-                  videoCoverUrl={video.coverUrl}
+                  onClick={() => router.push(`/media/${video.id}`)}
+                  videoCoverUrl={video.cover_url}
                   videoTitle={video.title}
                   videoDescription={video.description}
                 />

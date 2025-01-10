@@ -1,15 +1,24 @@
 import { ReactElement } from "react";
 import LayoutWithNavigation from "@/components/layouts/LayoutWithNavigation";
-import Image from "next/image";
-import videos from "@/data/videos";
 import { useRouter } from "next/router";
 import PlayIcon from "@/components/icons/PlayIcon";
 import HeartIcon from "@/components/icons/HeartIcon";
 import Carousel from "@/components/emblaCarousel/Carousel";
 import Link from "next/link";
 import { LocalStorageKeys } from "@/utils/constant";
+import { Tables } from "@/services/supabase";
+import { WistiaPlayer } from "@wistia/wistia-player-react";
+import { GetServerSidePropsContext } from "next";
+import { createPagesServerClient } from "@supabase/auth-helpers-nextjs";
+import { SavedVideo } from "@/utils/type";
 
-export default function VideoInfo() {
+export default function VideoInfo({
+  currentVideo,
+  relatedVideos,
+}: {
+  currentVideo: SavedVideo;
+  relatedVideos: SavedVideo[];
+}) {
   const router = useRouter();
 
   const onAddToFavorite = () => {
@@ -20,35 +29,36 @@ export default function VideoInfo() {
     }
   };
 
-  const currentVideo = videos[Number(router.query.slug as string)];
   if (!currentVideo) return <></>;
   return (
     <div>
       <div className="relative w-full">
         <div className="fixed inset-0 w-full h-screen">
-          <Image
-            src={videos[Number(router.query.slug as string)].coverUrl}
-            alt=""
-            fill
-            className="object-cover animate-zoomIn"
+          <WistiaPlayer
+            audioDescriptionControl={false}
+            playBarControl={false}
+            playPauseControl={false}
+            bigPlayButton={false}
+            fullscreenControl={false}
+            key={router.query.videoId as string}
+            className="object-cover max-lg:h-fit h-full w-full"
+            mediaId={currentVideo?.wistia_id}
           />
-          <div className="absolute bottom-0 z-50 h-full w-full bg-gradient-to-t from-black via-black/80" />
+          <div className="absolute bottom-0 z-50 h-full w-full bg-gradient-to-t from-black via-black/90 max-lg:to-black/80" />
         </div>
-        <div className="flex justify-center items-end w-full h-[66dvh] relative ">
+        <div className="flex justify-center items-end w-full h-[70dvh] lg:h-[66dvh] relative ">
           <div className="flex flex-col relative text-white ml-auto w-full p-5 gap-5 md:w-1/2 lg:w-[45%]">
-            <h3 className="text-2xl text-white font-bold">{currentVideo.title}</h3>
+            <h3 className="text-2xl text-white font-bold">{currentVideo?.title}</h3>
             <div className="flex gap-2">
-              {currentVideo.categories.map((category) => (
-                <div className="text-white w-fit bg-white/10 py-1 px-2 text-[10px] rounded-sm font-semibold uppercase">
-                  {category}
-                </div>
-              ))}
+              {currentVideo?.categories
+                .split(",")
+                .map((category) => (
+                  <div className="text-white w-fit bg-white/10 py-1 px-2 text-[10px] rounded-sm font-semibold uppercase">
+                    {category}
+                  </div>
+                ))}
             </div>
-            <p>{currentVideo.description}</p>
-            <p className="w-full lg:w-96">
-              One of the few remaining drone repairmen assigned to Earth, its surface devastated after decades of war
-              with the alien Scavs,
-            </p>
+            <p className="w-full lg:w-96 line-clamp-6">{currentVideo?.description}</p>
             <div className="flex gap-2">
               <Link
                 href={`/watch/${router.query.slug}`}
@@ -66,7 +76,7 @@ export default function VideoInfo() {
       </div>
       <div className="mx-auto w-full lg:w-fit mt-5">
         {/*<VideoCategory categoryName="Podcasts" videos={videos} />*/}
-        <Carousel videos={[...videos, ...videos]} />
+        {relatedVideos?.length > 0 && <Carousel videos={relatedVideos} />}
       </div>
     </div>
   );
@@ -75,3 +85,43 @@ export default function VideoInfo() {
 VideoInfo.getLayout = function (page: ReactElement) {
   return <LayoutWithNavigation>{page}</LayoutWithNavigation>;
 };
+
+export async function getServerSideProps(ctx: GetServerSidePropsContext) {
+  const supabase = createPagesServerClient(ctx);
+  const slug = ctx.query.slug as string;
+  if (!slug) {
+    return {
+      redirect: {
+        destination: "/",
+        permanent: true,
+      },
+    };
+  }
+
+  const { data: currentVideo } = await supabase
+    .from(Tables.VIDEOS)
+    .select<any, SavedVideo>("*")
+    .eq("id", slug)
+    .single();
+
+  if (!currentVideo) {
+    return {
+      redirect: {
+        destination: "/",
+        permanent: true,
+      },
+    };
+  }
+
+  const { data: relatedVideos } = await supabase
+    .from(Tables.VIDEOS)
+    .select<any, SavedVideo>("*")
+    .neq("id", currentVideo?.id);
+
+  return {
+    props: {
+      currentVideo,
+      relatedVideos: !relatedVideos ? [] : relatedVideos,
+    },
+  };
+}

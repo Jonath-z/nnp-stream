@@ -36,10 +36,10 @@ export default function Home() {
         <div className="mt-20 lg:mt-32">
           <VideoFilter />
         </div>
-        <VideoCategory categoryName="You might also like" videos={filteredVideos} />
-        <VideoCategory categoryName="Coming Soon" videos={filteredVideos} />
-        <VideoCategory categoryName="Podcasts" videos={filteredVideos} />
-        <VideoCategory categoryName="Film" videos={filteredVideos} />
+        {/*<VideoCategory categoryName="You might also like" videos={filteredVideos} />*/}
+        {/*<VideoCategory categoryName="Coming Soon" videos={filteredVideos} />*/}
+        <VideoCategory categoryName="Podcasts" type="podcast" />
+        {/*<VideoCategory categoryName="film" />*/}
       </div>
     </div>
   );
