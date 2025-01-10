@@ -7,9 +7,18 @@ import PlayIcon from "@/components/icons/PlayIcon";
 import HeartIcon from "@/components/icons/HeartIcon";
 import Carousel from "@/components/emblaCarousel/Carousel";
 import Link from "next/link";
+import { LocalStorageKeys } from "@/utils/constant";
 
 export default function VideoInfo() {
   const router = useRouter();
+
+  const onAddToFavorite = () => {
+    const userEmail = localStorage.getItem(LocalStorageKeys.NNP_USER_EMAIL);
+    if (!userEmail) {
+      router.push("/register");
+      return;
+    }
+  };
 
   const currentVideo = videos[Number(router.query.slug as string)];
   if (!currentVideo) return <></>;
@@ -48,8 +57,8 @@ export default function VideoInfo() {
                 <span>Watch now</span>
                 <PlayIcon className="fill-black size-5" />
               </Link>
-              <button className="bg-white/10 py-1 px-2 rounded-md">
-                <HeartIcon className="fill-white" />
+              <button onClick={onAddToFavorite} className="bg-white/10 py-1 px-2 rounded-md">
+                <HeartIcon className="stroke-white" />
               </button>
             </div>
           </div>

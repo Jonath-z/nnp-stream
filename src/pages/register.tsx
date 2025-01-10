@@ -5,6 +5,7 @@ import { saveUserEmail, supabase } from "@/services/supabase";
 import { useEffect, useState } from "react";
 import Spinner from "@/components/icons/Spinner";
 import { useRouter } from "next/router";
+import { LocalStorageKeys } from "@/utils/constant";
 
 export default function Register() {
   const [isLoading, setIsLoading] = useState(false);
@@ -16,7 +17,7 @@ export default function Register() {
       setIsLoading(true);
       await saveUserEmail(email);
       setIsLoading(false);
-      localStorage.setItem("nnp-stream-email", email);
+      localStorage.setItem(LocalStorageKeys.NNP_USER_EMAIL, email);
       setEmail("");
       router.push("/");
     } catch (err) {
