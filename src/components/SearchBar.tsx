@@ -5,8 +5,8 @@ import HeartIcon from "@/components/icons/HeartIcon";
 import Image from "next/image";
 import Link from "next/link";
 
-export default function SearchBar(props: ComponentProps<"input">) {
-  const { className, ...rest } = props;
+export default function SearchBar(props: ComponentProps<"input"> & { onSearch?: () => void }) {
+  const { className, onSearch, ...rest } = props;
   return (
     <div className="fixed w-full top-0 z-20 backdrop-blur flex gap-3 px-3 lg:px-0 justify-between items-center">
       <Link href="/" className="max-lg:block hidden size-10  relative">
@@ -24,7 +24,9 @@ export default function SearchBar(props: ComponentProps<"input">) {
             placeholder="Search videos..."
           />
         </div>
-        <button className="bg-nnp-highlight text-white py-2 px-5 rounded-md hidden lg:block">Search</button>
+        <button onClick={onSearch} className="bg-nnp-highlight text-white py-2 px-5 rounded-md hidden lg:block">
+          Search
+        </button>
       </div>
       <button>
         <HeartIcon className="size-7 stroke-white max-lg:block hidden" />

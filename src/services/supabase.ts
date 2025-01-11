@@ -22,17 +22,18 @@ export const getVideosByCategory = async (type: Category) => {
 };
 
 export const searchVideos = async (query: string) => {
-  return await supabase
-    .from(Tables.VIDEOS)
-    .select<any, SavedVideo>("*")
-    .textSearch("categories", query, {
-      type: "websearch",
-      config: "french",
+  const searchQuery = query
+    .trim()
+    .split(" ")
+    .map((text) => {
+      return `'${text}'`;
     })
-    .textSearch("type", query, {
-      type: "websearch",
-      config: "french",
-    });
+    .join(" | ");
+
+  return await supabase.from(Tables.VIDEOS).select<any, SavedVideo>().textSearch("description", `${searchQuery}`, {
+    type: "websearch",
+    config: "french",
+  });
 };
 
 export const getVideoById = async (id: string) => {
