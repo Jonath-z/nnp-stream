@@ -8,7 +8,7 @@ import Link from "next/link";
 import { LocalStorageKeys } from "@/utils/constant";
 import { Tables } from "@/services/supabase";
 import { WistiaPlayer } from "@wistia/wistia-player-react";
-import { GetServerSidePropsContext } from "next";
+import { GetServerSidePropsContext, GetStaticPaths, GetStaticProps } from "next";
 import { createPagesServerClient } from "@supabase/auth-helpers-nextjs";
 import { SavedVideo } from "@/utils/type";
 
@@ -86,32 +86,32 @@ VideoInfo.getLayout = function (page: ReactElement) {
   return <LayoutWithNavigation>{page}</LayoutWithNavigation>;
 };
 
-export async function getServerSideProps(ctx: GetServerSidePropsContext) {
+export const getStaticPaths: GetStaticPaths = async (ctx) => {
+  // @ts-ignore
   const supabase = createPagesServerClient(ctx);
-  const slug = ctx.query.slug as string;
-  if (!slug) {
-    return {
-      redirect: {
-        destination: "/",
-        permanent: true,
-      },
-    };
-  }
+  const { data: videos } = await supabase.from(Tables.VIDEOS).select<any, SavedVideo>("id");
+
+  const paths =
+    videos?.map((video) => ({
+      params: { slug: video.id },
+    })) || [];
+
+  return {
+    paths,
+    fallback: "blocking", // Use 'blocking' to generate pages on-demand for unmatched paths
+  };
+};
+
+export const getStaticProps: GetStaticProps = async (ctx) => {
+  // @ts-ignore
+  const supabase = createPagesServerClient(ctx);
+  const slug = ctx.params?.slug as string;
 
   const { data: currentVideo } = await supabase
     .from(Tables.VIDEOS)
     .select<any, SavedVideo>("*")
     .eq("id", slug)
     .single();
-
-  if (!currentVideo) {
-    return {
-      redirect: {
-        destination: "/",
-        permanent: true,
-      },
-    };
-  }
 
   const { data: relatedVideos } = await supabase
     .from(Tables.VIDEOS)
@@ -121,7 +121,48 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   return {
     props: {
       currentVideo,
-      relatedVideos: !relatedVideos ? [] : relatedVideos,
+      relatedVideos: relatedVideos || [],
     },
+    revalidate: 60 * 60 * 60 * 60,
   };
-}
+};
+
+// export async function getServerSideProps(ctx: GetServerSidePropsContext) {
+//   const supabase = createPagesServerClient(ctx);
+//   const slug = ctx.query.slug as string;
+//   if (!slug) {
+//     return {
+//       redirect: {
+//         destination: "/",
+//         permanent: true,
+//       },
+//     };
+//   }
+//
+//   const { data: currentVideo } = await supabase
+//     .from(Tables.VIDEOS)
+//     .select<any, SavedVideo>("*")
+//     .eq("id", slug)
+//     .single();
+//
+//   if (!currentVideo) {
+//     return {
+//       redirect: {
+//         destination: "/",
+//         permanent: true,
+//       },
+//     };
+//   }
+//
+//   const { data: relatedVideos } = await supabase
+//     .from(Tables.VIDEOS)
+//     .select<any, SavedVideo>("*")
+//     .neq("id", currentVideo?.id);
+//
+//   return {
+//     props: {
+//       currentVideo,
+//       relatedVideos: !relatedVideos ? [] : relatedVideos,
+//     },
+//   };
+// }
