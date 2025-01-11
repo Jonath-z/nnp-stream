@@ -20,7 +20,7 @@ export default function WatchVideoCard(props: WatchVideoCardProps) {
       </div>
       <div className="flex flex-col justify-center items-start gap-0.5">
         <b className="text-white text-xs whitespace-pre-wrap">{videoTitle}</b>
-        <small className="text-nnp-muted text-[10px]">{categories.join("&")}</small>
+        <small className="text-nnp-muted text-[10px]">{categories.join(" & ")}</small>
         <small className="text-nnp-light-gray font-medium text-xs">{duration}</small>
       </div>
     </div>

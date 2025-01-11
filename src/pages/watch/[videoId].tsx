@@ -1,9 +1,7 @@
 import { ReactElement, useState } from "react";
 import LayoutWithNavigation from "@/components/layouts/LayoutWithNavigation";
 import { WistiaPlayer } from "@wistia/wistia-player-react";
-import videos from "@/data/videos";
 import { useRouter } from "next/router";
-import Image from "next/image";
 import SearchBar from "@/components/SearchBar";
 import VideoFilter from "@/components/VideoFilter";
 // @ts-ignore
@@ -16,6 +14,8 @@ import { GetServerSidePropsContext } from "next";
 import { createPagesServerClient } from "@supabase/auth-helpers-nextjs";
 import { Tables } from "@/services/supabase";
 import { SavedVideo } from "@/utils/type";
+import useSearch from "@/hooks/useSearch";
+import useFilter from "@/hooks/useFilter";
 
 dayjs.extend(relativeTime);
 dayjs.extend(duration);
@@ -29,10 +29,18 @@ export default function WatchPage({
 }) {
   const router = useRouter();
   const [videoData, setVideoData] = useState<WistiaPlayerCustomEvent>(null);
+  const { setSelectedFilter, filteredVideoResult, selectedFilter } = useFilter();
+  const { refetch, searchedVideos, setSearchQuery, isLoading, searchQuery } = useSearch(selectedFilter === "all");
+
+  const shouldShowSearchResult = !filteredVideoResult?.data || selectedFilter === "all";
 
   return (
     <div>
-      <SearchBar />
+      <SearchBar
+        isLoading={isLoading}
+        onSearch={refetch}
+        onChange={(e) => setTimeout(() => setSearchQuery(e.target.value), 500)}
+      />
       <div className="flex max-lg:flex-col gap-5 mt-20 lg:mt-32 mx-3 lg:mx-10">
         <div className="max-lg:w-full w-4/6">
           <WistiaPlayer
@@ -68,7 +76,7 @@ export default function WatchPage({
         </div>
         <div className="flex-1 overflow-x-auto">
           <div className="mb-5 flex w-full overflow-x-auto max-w-full">
-            <VideoFilter />
+            <VideoFilter onSelectFilter={(value) => setSelectedFilter(value)} />
           </div>
           <div className="flex flex-col gap-2 w-full bg-nnp-background/75 p-8 max-lg:p-4 rounded-xl">
             {relatedVideos.map(({ title, cover_url, description, categories, id, duration }, index) => (
@@ -83,20 +91,43 @@ export default function WatchPage({
               />
             ))}
           </div>
-          {/*<hr className="my-5" />*/}
-          {/*<div className="flex flex-col gap-2">*/}
-          {/*  <h3 className="text-white font-bold text-xs mb-2">You might also like this</h3>*/}
-          {/*  {[...videos].map(({ title, coverUrl, description, categories }, index) => (*/}
-          {/*    <WatchVideoCard*/}
-          {/*      key={`video-watch-${index}`}*/}
-          {/*      onClick={() => router.push(`/watch/${index}`)}*/}
-          {/*      categories={categories}*/}
-          {/*      videoDescription={description}*/}
-          {/*      videoCoverUrl={coverUrl}*/}
-          {/*      videoTitle={title}*/}
-          {/*    />*/}
-          {/*  ))}*/}
-          {/*</div>*/}
+          {shouldShowSearchResult && !!searchQuery && searchedVideos?.data && searchedVideos.data.length > 0 && (
+            <>
+              <hr className="my-5" />
+              <div className="flex flex-col gap-2">
+                <h3 className="text-white font-bold text-xs mb-2">Search result</h3>
+                {searchedVideos.data.map(({ title, cover_url, description, categories, id, duration }, index) => (
+                  <WatchVideoCard
+                    key={id}
+                    onClick={() => router.push(`/watch/${id}`)}
+                    categories={categories.split(",")}
+                    videoDescription={description}
+                    videoCoverUrl={cover_url}
+                    videoTitle={title}
+                    duration={duration}
+                  />
+                ))}
+              </div>
+            </>
+          )}
+          {selectedFilter !== "all" && (
+            <>
+              <div className="flex flex-col gap-2 mt-5">
+                <h3 className="text-white font-bold text-xs mb-2">{selectedFilter.toUpperCase()}</h3>
+                {filteredVideoResult?.data?.map(({ title, cover_url, description, categories, id, duration }) => (
+                  <WatchVideoCard
+                    key={id}
+                    onClick={() => router.push(`/watch/${id}`)}
+                    categories={categories.split(",")}
+                    videoDescription={description}
+                    videoCoverUrl={cover_url}
+                    videoTitle={title}
+                    duration={duration}
+                  />
+                ))}
+              </div>
+            </>
+          )}
         </div>
       </div>
     </div>

@@ -4,9 +4,10 @@ import SearchIcon from "@/components/icons/SearchIcon";
 import HeartIcon from "@/components/icons/HeartIcon";
 import Image from "next/image";
 import Link from "next/link";
+import Spinner from "@/components/icons/Spinner";
 
-export default function SearchBar(props: ComponentProps<"input"> & { onSearch?: () => void }) {
-  const { className, onSearch, ...rest } = props;
+export default function SearchBar(props: ComponentProps<"input"> & { onSearch?: () => void; isLoading?: boolean }) {
+  const { className, onSearch, isLoading, ...rest } = props;
   return (
     <div className="fixed w-full top-0 z-20 backdrop-blur flex gap-3 px-3 lg:px-0 justify-between items-center">
       <Link href="/" className="max-lg:block hidden size-10  relative">
@@ -25,7 +26,7 @@ export default function SearchBar(props: ComponentProps<"input"> & { onSearch?: 
           />
         </div>
         <button onClick={onSearch} className="bg-nnp-highlight text-white py-2 px-5 rounded-md hidden lg:block">
-          Search
+          {isLoading ? <Spinner className="animate-spin" /> : "Search"}
         </button>
       </div>
       <button>

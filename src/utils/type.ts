@@ -1,4 +1,4 @@
-export type Category = "podcast" | "film" | "freestyle" | "whatupnnp";
+export type Category = "all" | "podcast" | "film" | "freestyle" | "whatupnnp";
 export type SavedVideo = {
   id: string;
   created_at: string;

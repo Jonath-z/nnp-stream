@@ -1,13 +1,14 @@
 import { videoCategory } from "@/data/videoCategories";
 import { useState } from "react";
 import { cn } from "@/utils/index";
+import { Category } from "@/utils/type";
 
-export default function VideoFilter({ onSelectFilter }: { onSelectFilter?: (value: string) => void }) {
+export default function VideoFilter({ onSelectFilter }: { onSelectFilter?: (value: Category) => void }) {
   const [selectedFilter, setSelectedFilter] = useState("");
 
   const onFilter = (value: string) => {
     setSelectedFilter(value);
-    onSelectFilter?.(value);
+    onSelectFilter?.(value as Category);
   };
 
   return (
