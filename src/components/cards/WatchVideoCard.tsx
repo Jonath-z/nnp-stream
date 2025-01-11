@@ -10,7 +10,7 @@ type WatchVideoCardProps = {
 };
 
 export default function WatchVideoCard(props: WatchVideoCardProps) {
-  const { videoCoverUrl, videoDescription, duration, videoTitle, onClick, categories } = props;
+  const { videoCoverUrl, duration, videoTitle, onClick, categories } = props;
   return (
     <div className="flex w-full gap-3" onClick={onClick}>
       <div className="relative w-32 h-20 rounded-md cursor-pointer">
