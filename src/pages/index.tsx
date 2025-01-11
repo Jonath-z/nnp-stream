@@ -24,6 +24,10 @@ export default function Home() {
     queryKey: ["filterAndSearch", searchQuery],
     queryFn: () => searchVideos(searchQuery),
     enabled: !!searchQuery,
+    refetchOnWindowFocus: false,
+    refetchOnMount: false,
+    retry: false,
+    staleTime: Infinity,
   });
 
   return (
