@@ -4,6 +4,7 @@ import { useState } from "react";
 
 export default function useSearch(enabled = true) {
   const [searchQuery, setSearchQuery] = useState("");
+
   const { data: searchedVideos, ...rest } = useQuery({
     queryKey: ["filterAndSearch", searchQuery],
     queryFn: () => searchVideos(searchQuery),

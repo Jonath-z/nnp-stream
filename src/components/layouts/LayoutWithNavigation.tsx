@@ -29,7 +29,6 @@ export default function LayoutWithNavigation({ children }: { children: ReactNode
 
   const toggleSidebar = () => {
     setSidebarOpened((prev) => {
-      console.log({ width: sideBarRef.current?.offsetWidth });
       setSidebarWidth(sideBarRef.current?.offsetWidth || 0);
       saveSidebarStateInLocalStorage(!prev);
       return !prev;
@@ -85,7 +84,7 @@ export default function LayoutWithNavigation({ children }: { children: ReactNode
               </span>
             </Link>
             <Link
-              href="/#"
+              href="/favorites"
               data-active={asPath.toLowerCase() === "favorites"}
               className="group flex items-center gap-2"
             >
