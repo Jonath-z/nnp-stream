@@ -20,7 +20,6 @@ export default function VideoCategory({
   const { data, isLoading } = useQuery({
     queryKey: ["getVideoByCategory", categoryName],
     queryFn: () => getVideosByCategory(type),
-    _optimisticResults: "optimistic",
     refetchOnWindowFocus: false,
     retry: false,
   });

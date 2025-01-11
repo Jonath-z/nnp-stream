@@ -14,8 +14,25 @@ export const saveUserEmail = async (email: string) => {
   return await supabase.from(Tables.USERS).insert({ email });
 };
 
-export const getVideosByCategory = async (category: Category) => {
-  return await supabase.from(Tables.VIDEOS).select<any, SavedVideo>("*");
+export const getVideosByCategory = async (type: Category) => {
+  return await supabase.from(Tables.VIDEOS).select<any, SavedVideo>().textSearch("type", type, {
+    type: "websearch",
+    config: "french",
+  });
+};
+
+export const searchVideos = async (query: string) => {
+  return await supabase
+    .from(Tables.VIDEOS)
+    .select<any, SavedVideo>("*")
+    .textSearch("categories", query, {
+      type: "websearch",
+      config: "french",
+    })
+    .textSearch("type", query, {
+      type: "websearch",
+      config: "french",
+    });
 };
 
 export const getVideoById = async (id: string) => {

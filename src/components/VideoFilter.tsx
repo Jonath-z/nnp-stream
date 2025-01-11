@@ -2,20 +2,12 @@ import { videoCategory } from "@/data/videoCategories";
 import { useState } from "react";
 import { cn } from "@/utils/index";
 
-export default function VideoFilter({ onSelectFilter }: { onSelectFilter?: ([]: string[]) => void }) {
-  const [selectedFilter, setSelectedFilter] = useState([""]);
+export default function VideoFilter({ onSelectFilter }: { onSelectFilter?: (value: string) => void }) {
+  const [selectedFilter, setSelectedFilter] = useState("");
 
   const onFilter = (value: string) => {
-    setSelectedFilter((prev) => {
-      if (prev.includes(value)) {
-        const remainingFilters = prev.filter((category) => category.toLowerCase() !== value.toLowerCase());
-        onSelectFilter?.(remainingFilters);
-        return remainingFilters;
-      }
-      const updatedFilters = [...prev, value];
-      onSelectFilter?.(updatedFilters);
-      return updatedFilters;
-    });
+    setSelectedFilter(value);
+    onSelectFilter?.(value);
   };
 
   return (
