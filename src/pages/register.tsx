@@ -1,16 +1,28 @@
 import Image from "next/image";
 import Link from "next/link";
 import NnpLogo from "@/components/icons/NnpLogo";
-import { saveUserEmail, supabase } from "@/services/supabase";
+import { saveUserEmail, loginWithMagicLink } from "@/services/supabase";
 import { useEffect, useState } from "react";
 import Spinner from "@/components/icons/Spinner";
 import { useRouter } from "next/router";
 import { LocalStorageKeys } from "@/utils/constant";
+import { createClient } from '@/services/supabase/component'
 
 export default function Register() {
   const [isLoading, setIsLoading] = useState(false);
   const [email, setEmail] = useState("");
   const router = useRouter();
+  const supabase = createClient();
+
+
+  async function logIn() {
+    const { error } = await supabase.auth.signInWithOtp({ email })
+    if (error) {
+      console.error(error)
+    }
+    router.push('/')
+  }
+
 
   const saveEmail = async () => {
     try {
@@ -18,6 +30,8 @@ export default function Register() {
       await saveUserEmail(email);
       setIsLoading(false);
       localStorage.setItem(LocalStorageKeys.NNP_USER_EMAIL, email);
+      // loginWithMagicLink(email);
+      logIn();
       setEmail("");
       router.push("/");
     } catch (err) {
@@ -62,7 +76,7 @@ export default function Register() {
               onClick={saveEmail}
               className="bg-nnp-highlight max-lg:w-full disabled:opacity-70 text-white font-semibold px-10 py-3 rounded-md"
             >
-              {isLoading ? <Spinner className="animate-spin text-white" /> : "Enregistez-vous"}
+              {isLoading ? <Spinner className="animate-spin text-white" /> : "Identifiez-vous"}
             </button>
           </div>
         </div>
