@@ -31,8 +31,8 @@ export default function VideoInfo({
 
   if (!currentVideo) return <></>;
   return (
-    <div>
-      <div className="relative w-full">
+    <div className="md:ml-20">
+      <div className="relative w-full ">
         <div className="fixed inset-0 w-full h-screen">
           <WistiaPlayer
             audioDescriptionControl={false}
@@ -46,9 +46,9 @@ export default function VideoInfo({
           />
           <div className="absolute bottom-0 z-50 h-full w-full bg-gradient-to-t from-black via-black/90 max-lg:to-black/80" />
         </div>
-        <div className="flex justify-center items-end w-full h-[70dvh] lg:h-[66dvh] relative ">
-          <div className="flex flex-col relative text-white ml-auto w-full p-5 gap-5 md:w-1/2 lg:w-[45%]">
-            <h3 className="text-2xl text-white font-bold">{currentVideo?.title}</h3>
+        <div className="flex justify-center items-end w-full h-[70dvh] lg:h-[66dvh] relative md:ml-[6.7rem]">
+          <div className="flex flex-col relative text-white mr-auto w-full p-5 gap-5 md:w-1/2 lg:w-[45%]">
+            <h3 className="text-2xl md:text-4xl text-white font-bold">{currentVideo?.title}</h3>
             <div className="flex gap-2">
               {currentVideo?.categories
                 .split(",")
@@ -58,7 +58,7 @@ export default function VideoInfo({
                   </div>
                 ))}
             </div>
-            <p className="w-full lg:w-96 line-clamp-6">{currentVideo?.description}</p>
+            <p className="w-full lg:w-96 line-clamp-3">{currentVideo?.description}</p>
             <div className="flex gap-2">
               <Link
                 href={`/watch/${router.query.slug}`}
@@ -74,7 +74,7 @@ export default function VideoInfo({
           </div>
         </div>
       </div>
-      <div className="mx-auto w-full lg:w-fit mt-5">
+      <div className="w-full lg:w-full mt-5">
         {/*<VideoCategory categoryName="Podcasts" videos={videos} />*/}
         {relatedVideos?.length > 0 && <Carousel videos={relatedVideos} />}
       </div>
