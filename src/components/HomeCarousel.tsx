@@ -2,7 +2,7 @@ import { getVideosByCategory } from "@/services/supabase";
 import { useQuery } from "@tanstack/react-query";
 import { Carousel } from "react-responsive-carousel";
 import Image from "next/image";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { SavedVideo } from "@/utils/type";
 import Link from "next/link";
 import PlayIcon from "./icons/PlayIcon";
@@ -10,14 +10,21 @@ import HeartIcon from "./icons/HeartIcon";
 import { WistiaPlayer } from "@wistia/wistia-player-react";
 
 export default function HomeCarousel() {
-  const [currentVideo, setCurrentVideo] = useState<SavedVideo>();
-  const { data } = useQuery({
+  const { data, isLoading } = useQuery({
     queryKey: ["getTrendingVideo"],
     queryFn: () => getVideosByCategory("podcast"),
     refetchOnWindowFocus: false,
     retry: false,
   });
+  const [currentVideo, setCurrentVideo] = useState<SavedVideo | undefined>(() => data?.data?.[0]);
 
+  useEffect(() => {
+    if (!isLoading) {
+      setCurrentVideo(data?.data?.[0]);
+    }
+  }, [isLoading]);
+
+  if (isLoading) return <div className="h-[700px]" />;
   return (
     <div className="mb-10">
       <Carousel
