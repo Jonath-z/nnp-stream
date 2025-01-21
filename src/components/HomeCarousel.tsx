@@ -10,8 +10,8 @@ import HeartIcon from "./icons/HeartIcon";
 import { WistiaPlayer } from "@wistia/wistia-player-react";
 
 export default function HomeCarousel() {
-  const [currentVideo, setCurrentVideo] = useState<SavedVideo | null>(null);
-  const { data, isLoading } = useQuery({
+  const [currentVideo, setCurrentVideo] = useState<SavedVideo>();
+  const { data } = useQuery({
     queryKey: ["getTrendingVideo"],
     queryFn: () => getVideosByCategory("podcast"),
     refetchOnWindowFocus: false,
