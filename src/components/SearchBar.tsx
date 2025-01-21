@@ -9,7 +9,7 @@ import Spinner from "@/components/icons/Spinner";
 export default function SearchBar(props: ComponentProps<"input"> & { onSearch?: () => void; isLoading?: boolean }) {
   const { className, onSearch, isLoading, ...rest } = props;
   return (
-    <div className="fixed w-full top-0 z-20 backdrop-blur flex gap-3 px-3 lg:px-0 justify-between items-center">
+    <div className="fixed w-full top-0 z-20 flex gap-3 px-3 lg:px-0 justify-between items-center">
       <Link href="/" className="max-lg:block hidden size-10  relative">
         <Image src="/images/nnp-minified.png" alt="nnp logo" fill />
       </Link>

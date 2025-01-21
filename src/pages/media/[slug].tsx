@@ -8,7 +8,7 @@ import Link from "next/link";
 import { LocalStorageKeys } from "@/utils/constant";
 import { Tables } from "@/services/supabase";
 import { WistiaPlayer } from "@wistia/wistia-player-react";
-import { GetServerSidePropsContext, GetStaticPaths, GetStaticProps } from "next";
+import { GetStaticPaths, GetStaticProps } from "next";
 import { createPagesServerClient } from "@supabase/auth-helpers-nextjs";
 import { SavedVideo } from "@/utils/type";
 

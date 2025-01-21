@@ -102,12 +102,12 @@ export default function LayoutWithNavigation({ children }: { children: ReactNode
           // This is the sidebar width when expended and closed (w-56 and w-22)
           marginLeft: sidebarOpened ? 224 : 80,
         }}
-        className="overflow-y-auto w-full pb-20 flex-1 transition-[margin] max-lg:!ml-0 lg:mx-10"
+        className="overflow-y-auto w-full pb-20 flex-1 transition-[margin] max-lg:!ml-0 ml-10"
       >
         {children}
       </div>
-      <div className="fixed bg-gradient-to-br from-nnp-gradient blur-[100px] to-transparent rounded-br-full rounded-tr-full w-1/2 h-1/2 top-0 left-0 -z-10" />
-      <div className="fixed bg-gradient-to-br from-nnp-gradient blur-[100px] to-transparent rounded-br-full rounded-tr-full w-1/2 h-28 bottom-0 left-0 -mb-20 -z-10" />
+      {/* <div className="fixed bg-gradient-to-br from-nnp-gradient blur-[100px] to-transparent rounded-br-full rounded-tr-full w-1/2 h-1/2 top-0 left-0 -z-10" /> */}
+      {/* <div className="fixed bg-gradient-to-br from-nnp-gradient blur-[100px] to-transparent rounded-br-full rounded-tr-full w-1/2 h-28 bottom-0 left-0 -mb-20 -z-10" /> */}
     </div>
   );
 }
