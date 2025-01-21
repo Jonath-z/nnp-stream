@@ -28,11 +28,11 @@ export default function HomeCarousel() {
   return (
     <div className="mb-10">
       <Carousel
-        className="relative h-[700px] inset-0 flex flex-col justify-end items-end group"
+        className="relative h-[500px] lg:h-[700px] inset-0 flex flex-col lg:justify-end lg:items-end group"
         onChange={(index) => setCurrentVideo(data?.data?.[index] || data?.data?.[0])}
       >
         {data?.data?.map((video) => (
-          <div key={video.id} className="relative group-hover:h-[unset] w-full flex flex-col">
+          <div key={video.id} className="group-hover:h-[unset] w-full flex flex-col">
             <WistiaPlayer
               audioDescriptionControl={false}
               playBarControl={false}
@@ -43,13 +43,13 @@ export default function HomeCarousel() {
               className="object-cover h-full"
               mediaId={video?.wistia_id}
             />
-            <div className="bg-gradient-to-t via-nnp-primary from-nnp-primary to-transparent absolute left-0 right-0 bottom-0 w-full h-5/6 z-10" />
+            <div className="bg-gradient-to-t max-lg:via-nnp-primary/95 via-nnp-primary from-nnp-primary to-transparent absolute left-0 right-0 bottom-0 w-full h-5/6 z-10 -mb-1" />
           </div>
         ))}
       </Carousel>
       {currentVideo && (
         <div className="flex justify-center items-end w-full max-w-screen-xl lg:mx-auto relative px-3 -mt-72">
-          <div className="flex flex-col relative text-white mr-auto w-full max-md:px-3 gap-5 md:w-1/2 lg:w-[45%]">
+          <div className="flex flex-col relative text-white mr-auto w-full gap-5 md:w-1/2 lg:w-[45%]">
             <h3 className="text-2xl md:text-4xl text-white font-bold">{currentVideo?.title}</h3>
             <div className="flex gap-2">
               {currentVideo?.categories
