@@ -16,6 +16,8 @@ import { Tables } from "@/services/supabase";
 import { SavedVideo } from "@/utils/type";
 import useSearch from "@/hooks/useSearch";
 import useFilter from "@/hooks/useFilter";
+import Head from "next/head";
+import { SITE_URL } from "@/utils/constant";
 
 dayjs.extend(relativeTime);
 dayjs.extend(duration);
@@ -74,8 +76,50 @@ export default function WatchPage({
     );
   }
 
+  const videoTitle = videoData?.detail.mediaData?.name || currentVideo.title;
+  const videoDescription = videoData?.detail.mediaData?.seoDescription || currentVideo.description;
+  const pageTitle = `${videoTitle} | NNP stream`;
+  const canonicalUrl = `${SITE_URL}/${locale}/watch/${currentVideo.id}`;
+  const ogImageUrl = `${SITE_URL}/${currentVideo.cover_url}`;
   return (
     <div>
+      <Head>
+        <title>{pageTitle}</title>
+        <meta name="description" content={videoDescription} />
+        <link rel="canonical" href={canonicalUrl} />
+
+        {/* Open Graph / Facebook */}
+        <meta property="og:type" content="video.other" />
+        <meta property="og:url" content={canonicalUrl} />
+        <meta property="og:title" content={videoTitle} />
+        <meta property="og:description" content={videoDescription} />
+        <meta property="og:image" content={ogImageUrl} />
+        <meta property="og:locale" content={locale} />
+        <meta property="og:video" content={`${SITE_URL}/api/embed/${currentVideo.id}`} />
+
+        {/* Twitter */}
+        <meta property="twitter:card" content="summary_large_image" />
+        <meta property="twitter:url" content={canonicalUrl} />
+        <meta property="twitter:title" content={videoTitle} />
+        <meta property="twitter:description" content={videoDescription} />
+        <meta property="twitter:image" content={ogImageUrl} />
+
+        {/* Video metadata */}
+        {currentVideo.duration && <meta property="video:duration" content={currentVideo.duration.toString()} />}
+
+        {/* Structured data for video */}
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "VideoObject",
+            name: videoTitle,
+            description: videoDescription,
+            thumbnailUrl: ogImageUrl,
+            uploadDate: currentVideo.created_at || new Date().toISOString(),
+            embedUrl: `${SITE_URL}/api/embed/${currentVideo.id}`,
+          })}
+        </script>
+      </Head>
       <SearchBar
         isLoading={isLoading}
         onSearch={refetch}
