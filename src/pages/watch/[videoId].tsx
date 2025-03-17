@@ -88,6 +88,7 @@ export default function WatchPage({
             key={currentVideo.id}
             className="object-cover"
             qualityControl
+            autoplay
             mediaId={currentVideo.wistia_id}
             onLoadedMediaData={(data) => {
               setVideoData(data);
