@@ -80,7 +80,7 @@ export default function WatchPage({
   const videoDescription = videoData?.detail.mediaData?.seoDescription || currentVideo.description;
   const pageTitle = `${videoTitle} | NNP stream`;
   const canonicalUrl = `${SITE_URL}/${locale}/watch/${currentVideo.id}`;
-  const ogImageUrl = `${SITE_URL}/${currentVideo.cover_url}`;
+  const ogImageUrl = `${SITE_URL}${currentVideo.cover_url}`;
   return (
     <div>
       <Head>
