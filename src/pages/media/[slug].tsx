@@ -1,4 +1,4 @@
-import { ReactElement } from "react";
+import { ReactElement, useEffect, useState } from "react";
 import LayoutWithNavigation from "@/components/layouts/LayoutWithNavigation";
 import { useRouter } from "next/router";
 import PlayIcon from "@/components/icons/PlayIcon";
@@ -20,16 +20,42 @@ export default function VideoInfo({
   relatedVideos: SavedVideo[];
 }) {
   const router = useRouter();
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  useEffect(() => {
+    // Check if user is logged in on the client side
+    const userEmail = localStorage.getItem(LocalStorageKeys.NNP_USER_EMAIL);
+    setIsLoggedIn(!!userEmail);
+  }, []);
 
   const onAddToFavorite = () => {
-    const userEmail = localStorage.getItem(LocalStorageKeys.NNP_USER_EMAIL);
-    if (!userEmail) {
+    if (!isLoggedIn) {
       router.push("/register");
       return;
     }
   };
 
-  if (!currentVideo) return <></>;
+  // Show loading state while page is being generated with fallback
+  if (router.isFallback) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-nnp-highlight"></div>
+      </div>
+    );
+  }
+
+  // Handle case when video doesn't exist
+  if (!currentVideo) {
+    return (
+      <div className="flex flex-col items-center justify-center h-screen">
+        <h1 className="text-2xl font-bold mb-4">Video not found</h1>
+        <Link href="/" className="bg-nnp-highlight px-5 py-2 rounded-md font-bold text-black">
+          Go back home
+        </Link>
+      </div>
+    );
+  }
+
   return (
     <div className="md:ml-20">
       <div className="relative w-full ">
@@ -40,28 +66,29 @@ export default function VideoInfo({
             playPauseControl={false}
             bigPlayButton={false}
             fullscreenControl={false}
-            key={router.query.videoId as string}
+            key={currentVideo.wistia_id}
             className="object-cover max-lg:h-fit"
-            mediaId={currentVideo?.wistia_id}
+            mediaId={currentVideo.wistia_id}
           />
           <div className="absolute bottom-0 z-50 h-full w-full bg-gradient-to-t from-black via-black/90 max-lg:to-black/80" />
         </div>
         <div className="flex justify-center items-end w-full h-[70dvh] lg:h-[66dvh] relative md:ml-[6.7rem]">
           <div className="flex flex-col relative text-white mr-auto w-full p-5 gap-5 md:w-1/2 lg:w-[45%]">
-            <h3 className="text-2xl md:text-4xl text-white font-bold">{currentVideo?.title}</h3>
-            <div className="flex gap-2">
-              {currentVideo?.categories
-                .split(",")
-                .map((category) => (
-                  <div className="text-white w-fit bg-white/10 py-1 px-2 text-[10px] rounded-sm font-semibold uppercase">
-                    {category}
-                  </div>
-                ))}
+            <h3 className="text-2xl md:text-4xl text-white font-bold">{currentVideo.title}</h3>
+            <div className="flex gap-2 flex-wrap">
+              {currentVideo.categories.split(",").map((category, index) => (
+                <div
+                  key={index}
+                  className="text-white w-fit bg-white/10 py-1 px-2 text-[10px] rounded-sm font-semibold uppercase"
+                >
+                  {category.trim()}
+                </div>
+              ))}
             </div>
-            <p className="w-full lg:w-96 line-clamp-3">{currentVideo?.description}</p>
+            <p className="w-full lg:w-96 line-clamp-3">{currentVideo.description}</p>
             <div className="flex gap-2">
               <Link
-                href={`/watch/${router.query.slug}`}
+                href={`/watch/${currentVideo.id}`}
                 className="bg-nnp-highlight px-5 py-2 rounded-md font-bold text-black flex items-center gap-2"
               >
                 <span>Watch now</span>
@@ -74,10 +101,7 @@ export default function VideoInfo({
           </div>
         </div>
       </div>
-      <div className="w-full lg:w-full mt-5">
-        {/*<VideoCategory categoryName="Podcasts" videos={videos} />*/}
-        {relatedVideos?.length > 0 && <Carousel videos={relatedVideos} />}
-      </div>
+      <div className="w-full lg:w-full mt-5">{relatedVideos?.length > 0 && <Carousel videos={relatedVideos} />}</div>
     </div>
   );
 }
@@ -87,82 +111,70 @@ VideoInfo.getLayout = function (page: ReactElement) {
 };
 
 export const getStaticPaths: GetStaticPaths = async (ctx) => {
-  // @ts-ignore
-  const supabase = createPagesServerClient(ctx);
-  const { data: videos } = await supabase.from(Tables.VIDEOS).select<any, SavedVideo>("id");
+  try {
+    // @ts-expect-error
+    const supabase = createPagesServerClient(ctx);
+    const { data: videos, error } = await supabase.from(Tables.VIDEOS).select("id");
 
-  const paths =
-    videos?.map((video) => ({
-      params: { slug: video.id },
-    })) || [];
+    if (error) {
+      console.error("Error fetching video paths:", error);
+      return { paths: [], fallback: true };
+    }
+    const paths = videos.flatMap((video) => [
+      { params: { slug: video.id }, locale: "en" },
+      { params: { slug: video.id }, locale: "fr" },
+    ]);
 
-  return {
-    paths,
-    fallback: "blocking", // Use 'blocking' to generate pages on-demand for unmatched paths
-  };
+    return {
+      paths,
+      fallback: true, // Changed to true for better user experience
+    };
+  } catch (error) {
+    console.error("Error in getStaticPaths:", error);
+    return { paths: [], fallback: true };
+  }
 };
 
 export const getStaticProps: GetStaticProps = async (ctx) => {
-  // @ts-ignore
-  const supabase = createPagesServerClient(ctx);
-  const slug = ctx.params?.slug as string;
+  try {
+    // @ts-expect-error
+    const supabase = createPagesServerClient(ctx);
+    const slug = ctx.params?.slug as string;
 
-  const { data: currentVideo } = await supabase
-    .from(Tables.VIDEOS)
-    .select<any, SavedVideo>("*")
-    .eq("id", slug)
-    .single();
+    const { data: currentVideo, error: videoError } = await supabase
+      .from(Tables.VIDEOS)
+      .select("*")
+      .eq("id", slug)
+      .single();
 
-  const { data: relatedVideos } = await supabase
-    .from(Tables.VIDEOS)
-    .select<any, SavedVideo>("*")
-    .neq("id", currentVideo?.id);
+    if (videoError || !currentVideo) {
+      console.error("Error fetching video:", videoError);
+      return {
+        notFound: true,
+      };
+    }
 
-  return {
-    props: {
-      currentVideo,
-      relatedVideos: relatedVideos || [],
-    },
-    revalidate: 60 * 60 * 60 * 60,
-  };
+    const { data: relatedVideos, error: relatedError } = await supabase
+      .from(Tables.VIDEOS)
+      .select("*")
+      .neq("id", currentVideo.id)
+      .limit(10); // Limit to prevent too many related videos
+
+    if (relatedError) {
+      console.error("Error fetching related videos:", relatedError);
+    }
+
+    return {
+      props: {
+        currentVideo,
+        relatedVideos: relatedVideos || [],
+      },
+      revalidate: 3600, // Revalidate every hour (3600 seconds)
+    };
+  } catch (error) {
+    console.error("Error in getStaticProps:", error);
+    return {
+      notFound: true,
+    };
+  }
 };
-
-// export async function getServerSideProps(ctx: GetServerSidePropsContext) {
-//   const supabase = createPagesServerClient(ctx);
-//   const slug = ctx.query.slug as string;
-//   if (!slug) {
-//     return {
-//       redirect: {
-//         destination: "/",
-//         permanent: true,
-//       },
-//     };
-//   }
-//
-//   const { data: currentVideo } = await supabase
-//     .from(Tables.VIDEOS)
-//     .select<any, SavedVideo>("*")
-//     .eq("id", slug)
-//     .single();
-//
-//   if (!currentVideo) {
-//     return {
-//       redirect: {
-//         destination: "/",
-//         permanent: true,
-//       },
-//     };
-//   }
-//
-//   const { data: relatedVideos } = await supabase
-//     .from(Tables.VIDEOS)
-//     .select<any, SavedVideo>("*")
-//     .neq("id", currentVideo?.id);
-//
-//   return {
-//     props: {
-//       currentVideo,
-//       relatedVideos: !relatedVideos ? [] : relatedVideos,
-//     },
-//   };
-// }

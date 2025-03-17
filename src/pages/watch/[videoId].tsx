@@ -1,4 +1,4 @@
-import { ReactElement, useState } from "react";
+import { ReactElement, useState, useEffect } from "react";
 import LayoutWithNavigation from "@/components/layouts/LayoutWithNavigation";
 import { WistiaPlayer } from "@wistia/wistia-player-react";
 import { useRouter } from "next/router";
@@ -10,7 +10,7 @@ import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import duration from "dayjs/plugin/duration";
 import WatchVideoCard from "@/components/cards/WatchVideoCard";
-import { GetServerSidePropsContext } from "next";
+import { GetStaticPaths, GetStaticProps } from "next";
 import { createPagesServerClient } from "@supabase/auth-helpers-nextjs";
 import { Tables } from "@/services/supabase";
 import { SavedVideo } from "@/utils/type";
@@ -20,19 +20,59 @@ import useFilter from "@/hooks/useFilter";
 dayjs.extend(relativeTime);
 dayjs.extend(duration);
 
+// Define translations
+const translations = {
+  en: {
+    views: "Views",
+    view: "View",
+    posted: "Posted",
+    searchResult: "Search result",
+  },
+  fr: {
+    views: "Vues",
+    view: "Vue",
+    posted: "Publié",
+    searchResult: "Résultat de recherche",
+  },
+};
+
 export default function WatchPage({
   currentVideo,
   relatedVideos,
+  locale,
 }: {
   currentVideo: SavedVideo;
   relatedVideos: SavedVideo[];
+  locale: string;
 }) {
   const router = useRouter();
   const [videoData, setVideoData] = useState<WistiaPlayerCustomEvent>(null);
   const { setSelectedFilter, filteredVideoResult, selectedFilter } = useFilter();
   const { refetch, searchedVideos, setSearchQuery, isLoading, searchQuery } = useSearch(selectedFilter === "all");
+  const t = translations[locale as keyof typeof translations] || translations.en;
 
   const shouldShowSearchResult = !filteredVideoResult?.data || selectedFilter === "all";
+
+  // Show loading state while page is being generated with fallback
+  if (router.isFallback) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-nnp-highlight"></div>
+      </div>
+    );
+  }
+
+  // Handle case when video doesn't exist
+  if (!currentVideo) {
+    return (
+      <div className="flex flex-col items-center justify-center h-screen">
+        <h1 className="text-2xl font-bold mb-4">Video not found</h1>
+        <button onClick={() => router.push("/")} className="bg-nnp-highlight px-5 py-2 rounded-md font-bold text-black">
+          Go back home
+        </button>
+      </div>
+    );
+  }
 
   return (
     <div>
@@ -56,21 +96,21 @@ export default function WatchPage({
           <div className="mt-3">
             <div className="flex max-lg:flex-col max-lg:justify-start max-lg:items-start max-lg:gap-2 justify-between items-center">
               <h3 className="text-white font-bold text-sm lg:text-xl md:max-w-80">
-                {videoData?.detail.mediaData?.name}
+                {videoData?.detail.mediaData?.name || currentVideo.title}
               </h3>
               <div className="flex items-center gap-5 max-lg:gap-3">
                 <span className="text-white max-lg:text-xs font-medium">
                   {videoData && videoData?.detail.mediaData?.stats.uniquePlayCount > 1
-                    ? `${videoData?.detail.mediaData?.stats.uniquePlayCount} Views`
-                    : `${videoData?.detail.mediaData?.stats.uniquePlayCount} View`}
+                    ? `${videoData?.detail.mediaData?.stats.uniquePlayCount} ${t.views}`
+                    : `${videoData?.detail.mediaData?.stats.uniquePlayCount || 0} ${t.view}`}
                 </span>
                 <p className="text-white m-0 max-lg:text-xs font-medium">
-                  Posted {dayjs(videoData?.detail.mediaData.createdAt * 1000).fromNow()}
+                  {t.posted} {videoData ? dayjs(videoData?.detail.mediaData.createdAt * 1000).fromNow() : ""}
                 </p>
               </div>
             </div>
             <p className="flex items-center gap-4 bg-nnp-primary-dark text-white font-medium rounded-xl p-8 mt-3 max-lg:text-sm max-lg:p-4">
-              {videoData?.detail.mediaData.seoDescription}
+              {videoData?.detail.mediaData.seoDescription || currentVideo.description}
             </p>
           </div>
         </div>
@@ -95,7 +135,7 @@ export default function WatchPage({
             <>
               <hr className="my-5" />
               <div className="flex flex-col gap-2">
-                <h3 className="text-white font-bold text-xs mb-2">Search result</h3>
+                <h3 className="text-white font-bold text-xs mb-2">{t.searchResult}</h3>
                 {searchedVideos.data.map(({ title, cover_url, description, categories, id, duration }, index) => (
                   <WatchVideoCard
                     key={id}
@@ -138,43 +178,81 @@ WatchPage.getLayout = function (page: ReactElement) {
   return <LayoutWithNavigation>{page}</LayoutWithNavigation>;
 };
 
-export async function getServerSideProps(ctx: GetServerSidePropsContext) {
-  const supabase = createPagesServerClient(ctx);
-  const videoId = ctx.query.videoId as string;
-  console.log({ query: ctx.query });
-  if (!videoId) {
+export const getStaticPaths: GetStaticPaths = async (ctx) => {
+  try {
+    //@ts-expect-error
+    const supabase = createPagesServerClient(ctx);
+    const { data: videos, error } = await supabase.from(Tables.VIDEOS).select("id");
+
+    if (error) {
+      console.error("Error fetching video paths:", error);
+      return { paths: [], fallback: true };
+    }
+
+    // Create paths for both English and French locales
+    const paths = videos.flatMap((video) => [
+      { params: { videoId: video.id }, locale: "en" },
+      { params: { videoId: video.id }, locale: "fr" },
+    ]);
+
     return {
-      redirect: {
-        destination: "/",
-        permanent: true,
+      paths,
+      fallback: true,
+    };
+  } catch (error) {
+    console.error("Error in getStaticPaths:", error);
+    return { paths: [], fallback: true };
+  }
+};
+
+export const getStaticProps: GetStaticProps = async (ctx) => {
+  try {
+    //@ts-expect-error
+    const supabase = createPagesServerClient(ctx);
+    const videoId = ctx.params?.videoId as string;
+    const locale = ctx.locale || "en";
+
+    if (!videoId) {
+      return {
+        notFound: true,
+      };
+    }
+
+    const { data: currentVideo, error: videoError } = await supabase
+      .from(Tables.VIDEOS)
+      .select("*")
+      .eq("id", videoId)
+      .single();
+
+    if (videoError || !currentVideo) {
+      console.error("Error fetching video:", videoError);
+      return {
+        notFound: true,
+      };
+    }
+
+    const { data: relatedVideos, error: relatedError } = await supabase
+      .from(Tables.VIDEOS)
+      .select("*")
+      .neq("id", currentVideo?.id)
+      .limit(10);
+
+    if (relatedError) {
+      console.error("Error fetching related videos:", relatedError);
+    }
+
+    return {
+      props: {
+        currentVideo,
+        relatedVideos: relatedVideos || [],
+        locale, // Pass the locale to the component
       },
+      revalidate: 1800, // Revalidate every 30 minutes (1800 seconds)
+    };
+  } catch (error) {
+    console.error("Error in getStaticProps:", error);
+    return {
+      notFound: true,
     };
   }
-
-  const { data: currentVideo } = await supabase
-    .from(Tables.VIDEOS)
-    .select<any, SavedVideo>("*")
-    .eq("id", videoId)
-    .single();
-
-  if (!currentVideo) {
-    return {
-      redirect: {
-        destination: "/",
-        permanent: true,
-      },
-    };
-  }
-
-  const { data: relatedVideos } = await supabase
-    .from(Tables.VIDEOS)
-    .select<any, SavedVideo>("*")
-    .neq("id", currentVideo?.id);
-
-  return {
-    props: {
-      currentVideo,
-      relatedVideos: !relatedVideos ? [] : relatedVideos,
-    },
-  };
-}
+};
