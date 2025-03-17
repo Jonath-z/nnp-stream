@@ -1,1 +1,1 @@
-export const videoCategory = ["all", "podcast"];
+export const videoCategory = ["all", "podcast", "freestyle"];

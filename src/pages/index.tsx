@@ -38,7 +38,7 @@ export default function Home() {
         {!!selectedFilter && selectedFilter !== "all" && (
           <VideoCategory type={selectedFilter as Category} key={selectedFilter} categoryName="Results" />
         )}
-        {(selectedFilter === "all" || !selectedFilter) && <VideoCategory categoryName="Podcasts" type="podcast" />}
+        {(selectedFilter === "all" || !selectedFilter) && <VideoCategory categoryName="All Videos" type="all" />}
       </div>
     </div>
   );

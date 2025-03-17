@@ -2,9 +2,7 @@
 import { Category, SavedVideo } from "@/utils/type";
 import { createClient } from "./component";
 
-
 export const supabase = createClient(); // default supabase calling-> from client components
-
 
 export enum Tables {
   FAVORITES = "favorites",
@@ -17,20 +15,22 @@ export const saveUserEmail = async (email: string) => {
 };
 
 export const loginWithMagicLink = async (email: string) => {
-  const {data, error} =  await supabase.auth.signInWithOtp({ 
-    email : email,
-    options : {
-      shouldCreateUser : true,
-    }
+  const { data, error } = await supabase.auth.signInWithOtp({
+    email: email,
+    options: {
+      shouldCreateUser: true,
+    },
   });
   if (error) {
-    console.error('Error logging in:', error.message); // only in dev
+    console.error("Error logging in:", error.message); // only in dev
   }
   return data;
 };
 
-
 export const getVideosByCategory = async (type: Category) => {
+  if (type === "all") {
+    return await supabase.from(Tables.VIDEOS).select<any, SavedVideo>("*");
+  }
   return await supabase.from(Tables.VIDEOS).select<any, SavedVideo>().textSearch("type", type, {
     type: "websearch",
     config: "french",
